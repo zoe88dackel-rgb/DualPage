@@ -1,0 +1,408 @@
+/* 双语对照模式：极简原生排版（无色块、无竖线、融入网页原本风格） */
+.lwt-bilingual-tag.lwt-bi-block {
+  display: block;
+  margin: 3px 0 4px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 0.94em;
+  font-weight: inherit;
+  line-height: 1.5;
+  letter-spacing: normal;
+  opacity: 0.76;
+}
+
+.lwt-bilingual-tag.lwt-bi-inline {
+  display: inline;
+  margin-left: 2px;
+  color: inherit;
+  font-size: 0.9em;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+/* iOS 毛玻璃悬浮胶囊容器 */
+#lwt-floating-root {
+  position: fixed;
+  right: 16px;
+  bottom: 92px;
+  z-index: 2147483646;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+#lwt-floating-pill {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14), 0 1px 3px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.16s cubic-bezier(0.32, 0.72, 0, 1), background 0.2s ease, box-shadow 0.2s ease;
+}
+
+#lwt-floating-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+}
+
+#lwt-floating-pill.lwt-active {
+  background: rgba(0, 122, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 122, 255, 0.36);
+}
+
+#lwt-floating-pill.lwt-loading {
+  background: rgba(52, 199, 89, 0.92);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+#lwt-floating-pill.lwt-dragging {
+  transform: scale(1.06);
+  transition: none;
+}
+
+#lwt-floating-btn {
+  all: unset;
+  box-sizing: border-box !important;
+  height: 100% !important;
+  padding: 0 11px 0 7px !important;
+  margin: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  color: #1C1C1E !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  cursor: grab !important;
+  user-select: none !important;
+  touch-action: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+#lwt-floating-logo {
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 6px !important;
+  background: #FFFFFF !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  pointer-events: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.16) !important;
+}
+
+#lwt-floating-pill.lwt-dragging #lwt-floating-btn {
+  cursor: grabbing !important;
+}
+
+#lwt-floating-more {
+  all: unset;
+  box-sizing: border-box !important;
+  width: 30px !important;
+  min-width: 30px !important;
+  height: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  border-left: 1px solid rgba(0, 0, 0, 0.09) !important;
+  background: transparent !important;
+  color: #636366 !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+}
+
+#lwt-floating-pill.lwt-active #lwt-floating-btn,
+#lwt-floating-pill.lwt-active #lwt-floating-more,
+#lwt-floating-pill.lwt-loading #lwt-floating-btn,
+#lwt-floating-pill.lwt-loading #lwt-floating-more {
+  color: #FFFFFF !important;
+}
+
+#lwt-floating-pill.lwt-active #lwt-floating-more,
+#lwt-floating-pill.lwt-loading #lwt-floating-more {
+  border-left-color: rgba(255, 255, 255, 0.28) !important;
+}
+
+/* iOS 控制中心风格快捷菜单 */
+#lwt-quick-menu {
+  position: absolute;
+  bottom: 44px;
+  right: 0;
+  width: 176px;
+  padding: 5px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.18);
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+}
+
+#lwt-quick-menu.lwt-menu-below {
+  bottom: auto;
+  top: 44px;
+}
+
+#lwt-quick-menu.lwt-menu-left {
+  right: auto;
+  left: 0;
+}
+
+#lwt-quick-menu.lwt-menu-open {
+  display: flex;
+}
+
+.lwt-menu-item {
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: #1C1C1E;
+  font-size: 12.5px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  text-align: left;
+}
+
+.lwt-menu-item:hover {
+  background: rgba(0, 122, 255, 0.1);
+}
+
+.lwt-menu-val {
+  font-size: 11.5px;
+  color: #8E8E93;
+  font-weight: 600;
+}
+
+.lwt-menu-val.lwt-on {
+  color: #34C759;
+}
+
+.lwt-menu-danger {
+  color: #FF3B30;
+}
+
+/* 划词沉浸式双按钮悬浮条（Apple/macOS 毛玻璃风格，强样式隔离） */
+#lwt-selection-chip {
+  position: fixed !important;
+  z-index: 2147483647 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 32px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  background: rgba(28, 28, 30, 0.9) !important;
+  backdrop-filter: blur(18px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28) !important;
+  overflow: hidden !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif !important;
+}
+
+#lwt-selection-chip .lwt-chip-btn {
+  all: unset;
+  box-sizing: border-box !important;
+  height: 100% !important;
+  padding: 0 11px !important;
+  margin: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  color: #F5F5F7 !important;
+  font-family: inherit !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: background 0.15s ease !important;
+}
+
+#lwt-selection-chip .lwt-chip-btn:hover {
+  background: rgba(255, 255, 255, 0.14) !important;
+}
+
+#lwt-selection-chip .lwt-chip-btn-right {
+  border-left: 1px solid rgba(255, 255, 255, 0.16) !important;
+  color: #64B5FF !important;
+  font-weight: 600 !important;
+}
+
+#lwt-selection-chip .lwt-chip-logo {
+  width: 17px !important;
+  height: 17px !important;
+  border-radius: 5px !important;
+  background: #FFFFFF !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.lwt-sel-immersive {
+  cursor: pointer;
+}
+
+/* 划词翻译卡片 */
+#lwt-selection-card {
+  position: fixed;
+  z-index: 2147483647;
+  width: 296px;
+  max-width: 90vw;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+  color: #1C1C1E;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+  overflow: hidden;
+}
+
+.lwt-sc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
+}
+
+.lwt-sc-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8E8E93;
+}
+
+.lwt-sc-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lwt-sc-btn {
+  border: none;
+  background: rgba(0, 122, 255, 0.12);
+  color: #007AFF;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.lwt-sc-close {
+  border: none;
+  background: rgba(118, 118, 128, 0.14);
+  color: #636366;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.lwt-sc-body {
+  padding: 11px 13px 13px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  max-height: 220px;
+  overflow-y: auto;
+  word-break: break-word;
+}
+
+.lwt-sc-err {
+  color: #FF3B30;
+}
+
+/* iOS 灵动岛风格顶部轻提示 */
+#lwt-toast {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  z-index: 2147483647;
+  max-width: 340px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: rgba(28, 28, 30, 0.86);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -10px) scale(0.96);
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+#lwt-toast.lwt-toast-show {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+#lwt-toast.lwt-toast-error {
+  background: rgba(255, 59, 48, 0.92);
+}
+
+/* 深色模式自适应 */
+@media (prefers-color-scheme: dark) {
+  #lwt-floating-pill:not(.lwt-active):not(.lwt-loading) {
+    background: rgba(44, 44, 46, 0.82);
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+  #lwt-floating-pill:not(.lwt-active):not(.lwt-loading) #lwt-floating-btn {
+    color: #F2F2F7 !important;
+  }
+  #lwt-floating-pill:not(.lwt-active):not(.lwt-loading) #lwt-floating-more {
+    color: #AEAEB2 !important;
+    border-left-color: rgba(255, 255, 255, 0.16) !important;
+  }
+  #lwt-quick-menu,
+  #lwt-selection-card {
+    background: rgba(38, 38, 40, 0.9);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #F2F2F7;
+  }
+  .lwt-menu-item {
+    color: #F2F2F7;
+  }
+  .lwt-sc-head {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+}
