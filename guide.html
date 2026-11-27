@@ -526,6 +526,87 @@
       font-weight: 400;
     }
 
+    /* 品牌介绍区（Apple 极简双栏叙事） */
+    .brand-story {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 52px;
+      align-items: center;
+    }
+
+    .brand-mark-card {
+      background: var(--surface-alt);
+      border: 0.5px solid var(--sep);
+      border-radius: var(--radius-xl);
+      padding: 44px 32px;
+      text-align: center;
+    }
+
+    .brand-mark-card img {
+      width: 96px;
+      height: 96px;
+      border-radius: 24px;
+      display: block;
+      margin: 0 auto 18px;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.1);
+    }
+
+    .brand-mark-name {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+    }
+
+    .brand-mark-sub {
+      font-size: 13px;
+      color: var(--text-tert);
+      margin-top: 4px;
+    }
+
+    .brand-copy h2 {
+      font-size: clamp(26px, 3.6vw, 36px);
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      line-height: 1.18;
+      margin-bottom: 16px;
+    }
+
+    .brand-copy p {
+      font-size: 16px;
+      color: var(--text-sec);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .brand-pillars {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      padding-top: 20px;
+      border-top: 0.5px solid var(--sep);
+    }
+
+    .pillar h4 {
+      font-size: 14.5px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .pillar span {
+      font-size: 13px;
+      color: var(--text-sec);
+      line-height: 1.55;
+      display: block;
+    }
+
+    @media (max-width: 760px) {
+      .brand-story,
+      .brand-pillars {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+    }
+
     /* 区块头部 */
     .sec-head {
       margin-bottom: 40px;
@@ -872,6 +953,7 @@
         <span>DualPage</span>
       </a>
       <div class="nav-links">
+        <a href="#brand">品牌</a>
         <a href="#features">亮点</a>
         <a href="#install">安装</a>
         <a href="#api">引擎与 API</a>
@@ -931,6 +1013,37 @@
               <span id="demoPillText">原文</span>
             </span>
             <span class="demo-pill-more">⋯</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 品牌介绍 -->
+  <section class="band" id="brand">
+    <div class="inner">
+      <div class="brand-story reveal">
+        <div class="brand-mark-card">
+          <img src="icons/logo256.png" alt="DualPage 品牌标志" />
+          <div class="brand-mark-name">DualPage</div>
+          <div class="brand-mark-sub">Dual Language · One Page</div>
+        </div>
+        <div class="brand-copy">
+          <h2>双页重叠，让语言不再成为阅读的隔阂。</h2>
+          <p>DualPage 的名字与标志，源于两张轻轻叠合的纸页：一页保留原网页的语境与排版，另一页自然展开你熟悉的语言。我们希望翻译工具像空气一样克制——没有账号弹窗、没有会员付费墙、没有服务器中转，只把安静、快速、体面的阅读体验留给你。</p>
+          <div class="brand-pillars">
+            <div class="pillar">
+              <h4>原生克制</h4>
+              <span>整段无感双语，不破坏原网页结构与视觉秩序。</span>
+            </div>
+            <div class="pillar">
+              <h4>完全开放</h4>
+              <span>免 Key 开箱即用，也自由接入任意 AI 与专属词库。</span>
+            </div>
+            <div class="pillar">
+              <h4>纯本地隐私</h4>
+              <span>零后端零追踪，密钥与阅读数据始终留在你的设备中。</span>
+            </div>
           </div>
         </div>
       </div>

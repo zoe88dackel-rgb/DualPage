@@ -71,7 +71,7 @@ window.addEventListener(
 
 // Apple 风格滚动逐级浮现（Scroll Reveal）
 const revealTargets = document.querySelectorAll(
-  ".sec-head, .bento-card, .step-card, .spec-list, .release-card"
+  ".brand-story, .sec-head, .bento-card, .step-card, .spec-list, .release-card"
 );
 
 revealTargets.forEach((el) => {
