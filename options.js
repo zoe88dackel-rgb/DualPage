@@ -54,7 +54,7 @@ themeToggleBtn?.addEventListener("click", () => {
   applyTheme(next);
 });
 
-const FREE_ENGINES = new Set(["pollinations", "edge", "google"]);
+const FREE_ENGINES = new Set(["google", "browser", "pollinations"]);
 const DEFAULTS = {
   zhipu: { baseUrl: "https://open.bigmodel.cn/api/paas/v4", model: "glm-4-flash" },
   siliconflow: { baseUrl: "https://api.siliconflow.cn/v1", model: "Qwen/Qwen2.5-7B-Instruct" },
@@ -64,7 +64,7 @@ const DEFAULTS = {
 };
 
 let settings = null;
-let selectedEngine = "edge";
+let selectedEngine = "google";
 
 let toastTimer = null;
 function showToast(msg) {

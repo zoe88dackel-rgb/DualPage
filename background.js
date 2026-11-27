@@ -1,6 +1,6 @@
-// 翻译King v2.1 — 高速双引擎后台服务（跨页缓存 + Token 持久化 + 超时自动切换）
+// DualPage v2.3.1 — 高速多引擎后台服务（跨页缓存 + 浏览器本地 AI + 三级自动兜底）
 const DEFAULT_SETTINGS = {
-  engine: "edge", // edge | google | deepseek | openai | gemini
+  engine: "google", // google | browser | pollinations | zhipu | siliconflow | deepseek | openai | gemini
   targetLang: "zh-CN", // zh-CN | en | ru
   displayMode: "replace", // replace | bilingual
   showFloatingBtn: true,
@@ -179,6 +179,8 @@ async function getSettings() {
   cachedSettings = {
     ...DEFAULT_SETTINGS,
     ...saved,
+    // 自动迁移已下线的旧版 edge 免费接口到 google
+    engine: saved.engine === "edge" ? "google" : (saved.engine || DEFAULT_SETTINGS.engine),
     ai: {
       ...DEFAULT_SETTINGS.ai,
       ...(saved.ai || {})
@@ -212,62 +214,66 @@ function buildMergedGlossary(settings) {
   return merged;
 }
 
-// 1. 微软 Edge 免费翻译（并发去重 Token 获取 + Session 持久化）
-async function getEdgeToken() {
-  await ensureSessionCacheLoaded();
-  const now = Date.now();
-  if (edgeTokenCache.token && now < edgeTokenCache.expiresAt) {
-    return edgeTokenCache.token;
-  }
-  if (edgeTokenPromise) return edgeTokenPromise;
-
-  edgeTokenPromise = (async () => {
-    try {
-      const resp = await fetchWithTimeout("https://edge.microsoft.com/translate/auth", {}, 3500);
-      if (!resp.ok) throw new Error(`Edge auth failed: ${resp.status}`);
-      const token = (await resp.text()).trim();
-      edgeTokenCache = { token, expiresAt: Date.now() + 8 * 60 * 1000 };
-      chrome.storage.session.set({ lwtEdgeToken: edgeTokenCache }).catch(() => {});
-      return token;
-    } finally {
-      edgeTokenPromise = null;
-    }
-  })();
-  return edgeTokenPromise;
+// 1. 浏览器原生本地离线翻译（Chrome 138+ / Edge 内置 Translator API，免 Key 零延迟）
+function detectSimpleSourceLang(sampleText, targetLang) {
+  const s = sampleText || "";
+  if (/[\u0400-\u04FF]/.test(s)) return "ru";
+  if (/[\u3040-\u30FF]/.test(s)) return "ja";
+  if (/[\uAC00-\uD7AF]/.test(s)) return "ko";
+  if (/[\u4E00-\u9FFF]/.test(s)) return "zh";
+  return targetLang.startsWith("en") ? "zh" : "en";
 }
 
-function mapLangForEdge(lang) {
-  if (lang === "zh-CN") return "zh-Hans";
+function mapLangForBrowser(lang) {
+  if (lang === "zh-CN") return "zh";
   if (lang === "zh-TW") return "zh-Hant";
   return lang;
 }
 
-async function translateWithEdge(texts, targetLang) {
-  const token = await getEdgeToken();
-  const to = mapLangForEdge(targetLang);
-  const url = `https://api-edge.cognitive.microsofttranslator.com/translate?from=&to=${encodeURIComponent(to)}&api-version=3.0`;
-  const resp = await fetchWithTimeout(
-    url,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(texts.map((t) => ({ Text: t })))
-    },
-    5000
-  );
+const browserTranslatorCache = new Map();
 
-  if (!resp.ok) {
-    if (resp.status === 401) {
-      edgeTokenCache = { token: "", expiresAt: 0 };
-      chrome.storage.session.remove("lwtEdgeToken").catch(() => {});
-    }
-    throw new Error(`Edge translate failed: ${resp.status}`);
+async function translateWithBrowserLocal(texts, targetLang) {
+  const TranslatorApi =
+    (typeof self !== "undefined" && (self.Translator || self.ai?.translator)) || null;
+  if (!TranslatorApi || typeof TranslatorApi.create !== "function") {
+    throw new Error("当前浏览器暂不支持内置离线翻译（需 Chrome 138+），请使用 Google 网页或 Pollinations AI");
   }
-  const data = await resp.json();
-  return data.map((item, idx) => item?.translations?.[0]?.text || texts[idx]);
+
+  const target = mapLangForBrowser(targetLang);
+  let source = detectSimpleSourceLang(texts.join(" "), target);
+
+  try {
+    const DetectorApi =
+      (typeof self !== "undefined" && (self.LanguageDetector || self.ai?.languageDetector)) || null;
+    if (DetectorApi && typeof DetectorApi.create === "function") {
+      const detector = await DetectorApi.create();
+      const detected = await detector.detect(texts.slice(0, 3).join(" "));
+      const top = detected?.[0]?.detectedLanguage;
+      if (top && top !== "und") source = top;
+    }
+  } catch {
+    // 忽略语种检测异常，沿用字符特征判断
+  }
+
+  if (source === target || (source === "zh-Hans" && target === "zh")) {
+    return texts.slice();
+  }
+
+  const pairKey = `${source}->${target}`;
+  let translator = browserTranslatorCache.get(pairKey);
+  if (!translator) {
+    translator = await TranslatorApi.create({
+      sourceLanguage: source,
+      targetLanguage: target
+    });
+    browserTranslatorCache.set(pairKey, translator);
+  }
+
+  const out = [];
+  for (const t of texts) {
+    out.push(await translator.translate(t));
+  }
+  return out;
 }
 
 // 2. Google 免费网页翻译
@@ -510,24 +516,29 @@ async function handleTranslateBatch(texts, options = {}) {
         translated = await translateWithPollinations(pendingTexts, settings, glossaryMap);
       } catch (err) {
         if (noFallback) throw err;
-        engineUsed = "edge-fallback";
-        translated = await translateWithEdge(pendingTexts, settings.targetLang);
-      }
-    } else if (settings.engine === "edge") {
-      try {
-        translated = await translateWithEdge(pendingTexts, settings.targetLang);
-      } catch (err) {
-        if (noFallback) throw err;
         engineUsed = "google-fallback";
         translated = await translateWithGoogle(pendingTexts, settings.targetLang);
       }
-    } else if (settings.engine === "google") {
+    } else if (settings.engine === "browser") {
+      try {
+        translated = await translateWithBrowserLocal(pendingTexts, settings.targetLang);
+      } catch (err) {
+        if (noFallback) throw err;
+        try {
+          engineUsed = "google-fallback";
+          translated = await translateWithGoogle(pendingTexts, settings.targetLang);
+        } catch {
+          engineUsed = "pollinations-fallback";
+          translated = await translateWithPollinations(pendingTexts, settings, glossaryMap);
+        }
+      }
+    } else if (settings.engine === "google" || settings.engine === "edge") {
       try {
         translated = await translateWithGoogle(pendingTexts, settings.targetLang);
       } catch (err) {
         if (noFallback) throw err;
-        engineUsed = "edge-fallback";
-        translated = await translateWithEdge(pendingTexts, settings.targetLang);
+        engineUsed = "pollinations-fallback";
+        translated = await translateWithPollinations(pendingTexts, settings, glossaryMap);
       }
     } else if (settings.engine === "gemini") {
       translated = await translateWithGemini(pendingTexts, settings, glossaryMap);
@@ -831,9 +842,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === "WARMUP") {
-    getSettings().then((s) => {
-      if (s.engine === "edge") getEdgeToken().catch(() => {});
-    });
+    ensureSessionCacheLoaded().catch(() => {});
     sendResponse({ ok: true });
     return false;
   }

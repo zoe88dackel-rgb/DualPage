@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://github.com/zoe88dackel-rgb/DualPage/releases/latest/download/DualPage-latest.zip">
-    <img src="https://img.shields.io/badge/一键下载最新安装包-v2.3.0%20ZIP-0071E3?style=for-the-badge&logo=github" alt="一键下载 DualPage 最新安装包" />
+    <img src="https://img.shields.io/badge/一键下载最新安装包-v2.3.1%20ZIP-0071E3?style=for-the-badge&logo=github" alt="一键下载 DualPage 最新安装包" />
   </a>
   <a href="https://github.com/zoe88dackel-rgb/DualPage/releases/latest">
     <img src="https://img.shields.io/badge/查看历史版本-Releases-1D1D1F?style=for-the-badge" alt="查看 Releases" />
@@ -29,7 +29,7 @@
 - **划词沉浸式对照**：选中任意外语片段弹出双按钮毛玻璃条——`划词翻译`（弹窗支持复制与朗读）或 `沉浸对照`（直接在该段下方插入双语译文）。
 - **可拖动毛玻璃悬浮球 & 右键菜单**：内置 DualPage 矢量 Logo，支持全屏拖动、左右贴边吸附、跨页记住位置，点 `⋯` 或右键菜单即可一键控制。
 - **多引擎 + 开放任意自定义 API**：
-  - **免 Key 开箱即用**：微软 Edge（国内高速直连）、Pollinations 开源 AI（含文字与视觉识图）、Google 翻译，支持超时自动切换兜底。
+  - **免 Key 开箱即用**：Google 网页（默认极速）、浏览器原生本地离线翻译（Chrome/Edge 内置 AI）、Pollinations 开源 AI（含文字与视觉识图），支持三级自动切换兜底。
   - **自带 Key / 自定义 API**：独立极简配置页，多平台 Key 独立保存，支持智谱 GLM（自动复用免费视觉模型 `glm-4v-flash`）、硅基流动（自动调用免费视觉模型 `Qwen2.5-VL`）、DeepSeek、Google Gemini 及任意 OpenAI 兼容接口 / 本地 Ollama。
 - **可视化专属术语表（支持 Excel 模板）**：支持在配置页逐条增删，一键下载 UTF-8 CSV 模板用 Excel/WPS 编辑后导入，或一键导出/导入整套配置 JSON 分享给团队。
 
