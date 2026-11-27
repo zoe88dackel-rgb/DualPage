@@ -108,7 +108,7 @@
     if (!el || el.nodeType !== Node.ELEMENT_NODE) return true;
     if (SKIP_TAGS.has(el.tagName)) return true;
     if (el.isContentEditable) return true;
-    if (el.closest("#lwt-floating-root, .lwt-bilingual-tag, #lwt-toast, #lwt-selection-chip, #lwt-selection-card")) {
+    if (el.closest("#lwt-floating-root, .lwt-bilingual-tag, #lwt-toast, #lwt-selection-chip, #lwt-selection-card, #lwt-img-badge, #lwt-image-card, #lwt-region-overlay")) {
       return true;
     }
     if (el.getAttribute("translate") === "no") return true;
@@ -743,6 +743,10 @@
         <span>显示模式</span>
         <span class="lwt-menu-val">${isBilingual ? "双语对照" : "仅译文"}</span>
       </button>
+      <button type="button" class="lwt-menu-item" data-act="region">
+        <span>框选截屏译图</span>
+        <span class="lwt-menu-val">Alt+I</span>
+      </button>
       <button type="button" class="lwt-menu-item" data-act="auto">
         <span>自动翻译本站</span>
         <span class="lwt-menu-val ${isAuto ? "lwt-on" : ""}">${isAuto ? "已开" : "关闭"}</span>
@@ -796,6 +800,9 @@
           renderQuickMenu();
           showToast(enable ? `已开启自动翻译 ${host}` : "已取消自动翻译本站");
         }
+      } else if (act === "region") {
+        closeQuickMenu();
+        startRegionCapture();
       } else if (act === "hide") {
         closeQuickMenu();
         floatingRoot.style.display = "none";
@@ -1184,6 +1191,277 @@
     }
   });
 
+  // ==================== 图片悬停「译图」+ 框选截屏译图 (Alt+I) + 清晰结果卡片 ====================
+  let imgBadge = null;
+  let hoveredImg = null;
+  let imgBadgeHideTimer = null;
+  let imgCard = null;
+  let regionOverlay = null;
+
+  function hideImgBadge() {
+    if (imgBadge) imgBadge.style.display = "none";
+    hoveredImg = null;
+  }
+
+  function ensureImgBadge() {
+    if (imgBadge || window.self !== window.top) return;
+    imgBadge = document.createElement("button");
+    imgBadge.id = "lwt-img-badge";
+    imgBadge.type = "button";
+    imgBadge.textContent = "译图";
+    imgBadge.title = "点击识别并翻译图片中的文字";
+    imgBadge.style.display = "none";
+    imgBadge.addEventListener("mouseenter", () => clearTimeout(imgBadgeHideTimer));
+    imgBadge.addEventListener("mouseleave", () => {
+      imgBadgeHideTimer = setTimeout(hideImgBadge, 220);
+    });
+    imgBadge.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!hoveredImg) return;
+      const targetImg = hoveredImg;
+      const rect = targetImg.getBoundingClientRect();
+      hideImgBadge();
+      translateImageElement(targetImg, rect);
+    });
+    document.body.appendChild(imgBadge);
+  }
+
+  document.addEventListener("mouseover", (e) => {
+    if (window.self !== window.top) return;
+    if (currentSettings && currentSettings.enableImageTranslate === false) return;
+    const img = e.target?.closest?.("img");
+    if (!img || img.closest("#lwt-floating-root, #lwt-image-card, #lwt-selection-card")) return;
+    const rect = img.getBoundingClientRect();
+    if (rect.width < 140 || rect.height < 90) return;
+
+    clearTimeout(imgBadgeHideTimer);
+    ensureImgBadge();
+    hoveredImg = img;
+    const top = Math.max(8, rect.top + 8);
+    const left = Math.min(window.innerWidth - 62, Math.max(8, rect.right - 56));
+    imgBadge.style.top = `${Math.round(top)}px`;
+    imgBadge.style.left = `${Math.round(left)}px`;
+    imgBadge.style.display = "inline-flex";
+  });
+
+  document.addEventListener("mouseout", (e) => {
+    if (!hoveredImg) return;
+    const rel = e.relatedTarget;
+    if (rel === imgBadge || rel === hoveredImg) return;
+    if (e.target === hoveredImg) {
+      imgBadgeHideTimer = setTimeout(hideImgBadge, 240);
+    }
+  });
+
+  function closeImageCard() {
+    if (imgCard) imgCard.remove();
+    imgCard = null;
+  }
+
+  async function openImageTranslationCard(payload, anchorRect) {
+    closeImageCard();
+    imgCard = document.createElement("div");
+    imgCard.id = "lwt-image-card";
+    imgCard.innerHTML = `
+      <div class="lwt-ic-head">
+        <span class="lwt-ic-title">图片文字翻译</span>
+        <div class="lwt-ic-actions">
+          <button type="button" class="lwt-sc-btn" data-ic="mode">仅译文</button>
+          <button type="button" class="lwt-sc-btn" data-ic="copy">复制</button>
+          <button type="button" class="lwt-sc-close" data-ic="close">✕</button>
+        </div>
+      </div>
+      <div class="lwt-ic-body">
+        <div class="lwt-ic-loading">正在识别图片文字并翻译...</div>
+      </div>
+    `;
+    document.body.appendChild(imgCard);
+
+    if (anchorRect) {
+      positionPopupNearRect(imgCard, anchorRect);
+    } else {
+      imgCard.style.left = `${Math.max(16, Math.round((window.innerWidth - 360) / 2))}px`;
+      imgCard.style.top = "72px";
+    }
+
+    let items = [];
+    let showOriginal = true;
+    const bodyEl = imgCard.querySelector(".lwt-ic-body");
+    const modeBtn = imgCard.querySelector('[data-ic="mode"]');
+
+    function renderItems() {
+      if (!bodyEl) return;
+      if (items.length === 0) {
+        bodyEl.innerHTML = `<div class="lwt-ic-empty">未在图片中识别到可翻译文字</div>`;
+        return;
+      }
+      bodyEl.innerHTML = "";
+      items.forEach((it) => {
+        const row = document.createElement("div");
+        row.className = "lwt-ic-row";
+        if (showOriginal && it.original && it.original !== it.translated) {
+          const origEl = document.createElement("div");
+          origEl.className = "lwt-ic-orig";
+          origEl.textContent = it.original;
+          row.appendChild(origEl);
+        }
+        const transEl = document.createElement("div");
+        transEl.className = "lwt-ic-trans";
+        transEl.textContent = it.translated;
+        row.appendChild(transEl);
+        bodyEl.appendChild(row);
+      });
+    }
+
+    imgCard.addEventListener("click", (e) => {
+      const act = e.target.closest("[data-ic]")?.dataset.ic;
+      if (act === "close") {
+        closeImageCard();
+      } else if (act === "mode") {
+        showOriginal = !showOriginal;
+        if (modeBtn) modeBtn.textContent = showOriginal ? "仅译文" : "双语";
+        renderItems();
+      } else if (act === "copy" && items.length > 0) {
+        const txt = items.map((i) => i.translated).join("\n");
+        navigator.clipboard?.writeText(txt);
+        showToast("图片译文已复制");
+      }
+    });
+
+    try {
+      const resp = await safeSendMessage({ type: "TRANSLATE_IMAGE", ...payload });
+      if (!imgCard) return;
+      if (!resp) {
+        closeImageCard();
+        return;
+      }
+      if (!resp.ok) {
+        bodyEl.innerHTML = `<div class="lwt-sc-err"></div>`;
+        bodyEl.querySelector(".lwt-sc-err").textContent = resp.error || "图片翻译失败";
+        return;
+      }
+      items = resp.items || [];
+      renderItems();
+      if (anchorRect) positionPopupNearRect(imgCard, anchorRect);
+    } catch (err) {
+      if (bodyEl) {
+        bodyEl.innerHTML = `<div class="lwt-sc-err"></div>`;
+        bodyEl.querySelector(".lwt-sc-err").textContent = `图片翻译异常: ${err.message || err}`;
+      }
+    }
+  }
+
+  function translateImageElement(imgEl, rect) {
+    const srcUrl = imgEl.currentSrc || imgEl.src;
+    if (!srcUrl) {
+      showToast("无法读取该图片地址，请用 Alt+I 框选截屏译图", true);
+      return;
+    }
+    openImageTranslationCard({ srcUrl }, rect);
+  }
+
+  function stopRegionCapture() {
+    if (regionOverlay) regionOverlay.remove();
+    regionOverlay = null;
+  }
+
+  function startRegionCapture() {
+    if (window.self !== window.top) return;
+    stopRegionCapture();
+    hideImgBadge();
+    hideSelectionUI();
+
+    regionOverlay = document.createElement("div");
+    regionOverlay.id = "lwt-region-overlay";
+    const hint = document.createElement("div");
+    hint.id = "lwt-region-hint";
+    hint.textContent = "拖动鼠标框选需要翻译的图片区域 · 按 Esc 取消";
+    const box = document.createElement("div");
+    box.id = "lwt-region-box";
+    regionOverlay.appendChild(hint);
+    regionOverlay.appendChild(box);
+    document.body.appendChild(regionOverlay);
+
+    let sx = 0;
+    let sy = 0;
+    let dragging = false;
+
+    regionOverlay.addEventListener("mousedown", (e) => {
+      if (e.button !== 0) return;
+      dragging = true;
+      sx = e.clientX;
+      sy = e.clientY;
+      box.style.display = "block";
+      box.style.left = `${sx}px`;
+      box.style.top = `${sy}px`;
+      box.style.width = "0px";
+      box.style.height = "0px";
+    });
+
+    regionOverlay.addEventListener("mousemove", (e) => {
+      if (!dragging) return;
+      const x = Math.min(sx, e.clientX);
+      const y = Math.min(sy, e.clientY);
+      const w = Math.abs(e.clientX - sx);
+      const h = Math.abs(e.clientY - sy);
+      box.style.left = `${x}px`;
+      box.style.top = `${y}px`;
+      box.style.width = `${w}px`;
+      box.style.height = `${h}px`;
+    });
+
+    regionOverlay.addEventListener("mouseup", async (e) => {
+      if (!dragging) return;
+      dragging = false;
+      const x = Math.min(sx, e.clientX);
+      const y = Math.min(sy, e.clientY);
+      const w = Math.abs(e.clientX - sx);
+      const h = Math.abs(e.clientY - sy);
+      stopRegionCapture();
+
+      if (w < 20 || h < 20) return;
+
+      // 等待一帧让遮罩彻底消失后再截屏
+      await new Promise((r) => setTimeout(r, 60));
+      const cap = await safeSendMessage({ type: "CAPTURE_VISIBLE_TAB" });
+      if (!cap || !cap.ok || !cap.dataUrl) {
+        showToast(cap?.error || "截屏失败", true);
+        return;
+      }
+
+      const dpr = window.devicePixelRatio || 1;
+      const img = new Image();
+      img.onload = () => {
+        const maxSide = 1280;
+        const srcW = Math.round(w * dpr);
+        const srcH = Math.round(h * dpr);
+        const scale = Math.min(1, maxSide / Math.max(srcW, srcH));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(srcW * scale));
+        canvas.height = Math.max(1, Math.round(srcH * scale));
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(
+          img,
+          Math.round(x * dpr),
+          Math.round(y * dpr),
+          srcW,
+          srcH,
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
+        const croppedDataUrl = canvas.toDataURL("image/jpeg", 0.88);
+        openImageTranslationCard(
+          { dataUrl: croppedDataUrl },
+          { left: x, top: y, right: x + w, bottom: y + h, width: w, height: h }
+        );
+      };
+      img.src = cap.dataUrl;
+    });
+  }
+
   // ==================== 灵动岛轻提示 ====================
   let toastTimer = null;
   function showToast(msg, isError = false) {
@@ -1201,14 +1479,19 @@
     }, 2600);
   }
 
-  // 快捷键：Alt+T 开关全页翻译，Esc 关闭划词卡片/菜单
+  // 快捷键：Alt+T 开关全页翻译，Alt+I 框选截屏译图，Esc 关闭弹窗与遮罩
   window.addEventListener("keydown", (e) => {
     if (e.altKey && (e.key === "t" || e.key === "T")) {
       e.preventDefault();
       toggleTranslation();
+    } else if (e.altKey && (e.key === "i" || e.key === "I")) {
+      e.preventDefault();
+      startRegionCapture();
     } else if (e.key === "Escape") {
       hideSelectionUI();
       closeQuickMenu();
+      closeImageCard();
+      stopRegionCapture();
     }
   });
 
@@ -1219,6 +1502,33 @@
     }
     if (message.type === "TOGGLE_TRANSLATE") {
       toggleTranslation().then(() => sendResponse({ ok: true, isActive }));
+      return true;
+    }
+    if (message.type === "TRANSLATE_SELECTION_FROM_MENU") {
+      const txt = (message.text || "").trim();
+      if (txt) {
+        openSelectionCard(txt, {
+          left: window.innerWidth / 2 - 140,
+          top: 90,
+          right: window.innerWidth / 2 + 140,
+          bottom: 120,
+          width: 280,
+          height: 30
+        });
+      }
+      sendResponse({ ok: true });
+      return true;
+    }
+    if (message.type === "TRANSLATE_IMAGE_URL") {
+      if (message.srcUrl) {
+        openImageTranslationCard({ srcUrl: message.srcUrl }, null);
+      }
+      sendResponse({ ok: true });
+      return true;
+    }
+    if (message.type === "START_REGION_CAPTURE") {
+      startRegionCapture();
+      sendResponse({ ok: true });
       return true;
     }
     if (message.type === "APPLY_SETTINGS_AND_RETRANSLATE") {

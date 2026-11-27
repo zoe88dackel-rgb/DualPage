@@ -5,6 +5,7 @@ const DEFAULT_SETTINGS = {
   displayMode: "replace", // replace | bilingual
   showFloatingBtn: true,
   enableSelectionTranslate: true,
+  enableImageTranslate: true,
   useGlossary: true,
   customGlossary: "",
   autoTranslateDomains: [],
@@ -109,6 +110,60 @@ chrome.runtime.onInstalled.addListener(async () => {
     await chrome.storage.sync.set({ settings: DEFAULT_SETTINGS });
   }
   getEdgeToken().catch(() => {});
+
+  // 注册浏览器右键菜单（翻译网页 / 翻译选中文字 / 翻译图片文字）
+  chrome.contextMenus.removeAll(() => {
+    chrome.contextMenus.create({
+      id: "dp-toggle-page",
+      title: "DualPage：翻译 / 还原当前网页",
+      contexts: ["page"]
+    });
+    chrome.contextMenus.create({
+      id: "dp-translate-selection",
+      title: "DualPage：翻译选中文字",
+      contexts: ["selection"]
+    });
+    chrome.contextMenus.create({
+      id: "dp-translate-image",
+      title: "DualPage：翻译图片中的文字",
+      contexts: ["image"]
+    });
+    chrome.contextMenus.create({
+      id: "dp-region-ocr",
+      title: "DualPage：框选截屏译图 (Alt+I)",
+      contexts: ["page", "image"]
+    });
+  });
+});
+
+async function sendTabMsgWithInject(tabId, msg) {
+  try {
+    return await chrome.tabs.sendMessage(tabId, msg);
+  } catch {
+    await chrome.scripting.insertCSS({ target: { tabId }, files: ["content.css"] });
+    await chrome.scripting.executeScript({ target: { tabId }, files: ["content.js"] });
+    await new Promise((r) => setTimeout(r, 90));
+    return await chrome.tabs.sendMessage(tabId, msg);
+  }
+}
+
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (!tab?.id || !/^https?:\/\//i.test(tab.url || "")) return;
+  if (info.menuItemId === "dp-toggle-page") {
+    sendTabMsgWithInject(tab.id, { type: "TOGGLE_TRANSLATE" }).catch(() => {});
+  } else if (info.menuItemId === "dp-translate-selection" && info.selectionText) {
+    sendTabMsgWithInject(tab.id, {
+      type: "TRANSLATE_SELECTION_FROM_MENU",
+      text: info.selectionText
+    }).catch(() => {});
+  } else if (info.menuItemId === "dp-translate-image" && info.srcUrl) {
+    sendTabMsgWithInject(tab.id, {
+      type: "TRANSLATE_IMAGE_URL",
+      srcUrl: info.srcUrl
+    }).catch(() => {});
+  } else if (info.menuItemId === "dp-region-ocr") {
+    sendTabMsgWithInject(tab.id, { type: "START_REGION_CAPTURE" }).catch(() => {});
+  }
 });
 
 async function getSettings() {
@@ -497,11 +552,281 @@ async function handleTranslateBatch(texts, options = {}) {
   return { translations: results, engineUsed };
 }
 
+// ==================== 图片文字识别与翻译（支持免 Key 视觉 AI 与自有视觉大模型） ====================
+function arrayBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
+}
+
+async function fetchImageAsDataUrl(srcUrl) {
+  if (/^data:image\//i.test(srcUrl)) return srcUrl;
+  const resp = await fetchWithTimeout(srcUrl, {}, 12000);
+  if (!resp.ok) throw new Error(`图片读取失败 (${resp.status})`);
+  const contentType = resp.headers.get("content-type") || "image/jpeg";
+  const mime = contentType.split(";")[0].trim() || "image/jpeg";
+  const buf = await resp.arrayBuffer();
+  if (buf.byteLength > 8 * 1024 * 1024) {
+    throw new Error("图片体积超过 8MB，建议使用 Alt+I 框选截屏译图");
+  }
+  return `data:${mime};base64,${arrayBufferToBase64(buf)}`;
+}
+
+function buildImagePrompt(targetLang, glossaryMap) {
+  const langName =
+    targetLang === "zh-CN" ? "简体中文" : targetLang === "en" ? "English" : targetLang;
+  const entries = Object.entries(glossaryMap).slice(0, 16);
+  const gloss = entries.length
+    ? `参考术语：${entries.map(([k, v]) => `${k}=>${v}`).join("；")}。`
+    : "";
+  return `你是精准的图片文字识别与翻译助手。请从上到下识别图片中的所有可见文字，并将其翻译为自然地道的${langName}。${gloss}
+请严格返回合法 JSON，格式如下：
+{"items":[{"original":"识别到的原文片段","translated":"对应译文"}]}
+要求：
+1. 按阅读顺序整理，合并同一行或同一气泡的完整句子；
+2. 不要遗漏价格、参数、标签或按钮上的文字；
+3. 如果图片中没有文字，返回 {"items":[]}；
+4. 只返回 JSON，不要输出任何额外解释或 Markdown 代码块。`;
+}
+
+function parseImageJsonResult(rawText) {
+  const cleaned = (rawText || "")
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
+
+  const tryParse = (str) => {
+    const obj = JSON.parse(str);
+    if (Array.isArray(obj?.items)) {
+      return obj.items
+        .filter((it) => it && (it.translated || it.original))
+        .map((it) => ({
+          original: String(it.original || "").trim(),
+          translated: String(it.translated || it.original || "").trim()
+        }));
+    }
+    if (Array.isArray(obj)) {
+      return obj.map((s) => ({ original: "", translated: String(s || "").trim() })).filter((x) => x.translated);
+    }
+    return null;
+  };
+
+  try {
+    const direct = tryParse(cleaned);
+    if (direct) return direct;
+  } catch {
+    // 提取 JSON 对象
+  }
+
+  const sIdx = cleaned.indexOf("{");
+  const eIdx = cleaned.lastIndexOf("}");
+  if (sIdx !== -1 && eIdx > sIdx) {
+    try {
+      const sub = tryParse(cleaned.slice(sIdx, eIdx + 1));
+      if (sub) return sub;
+    } catch {
+      // 兜底为纯文本
+    }
+  }
+
+  if (cleaned) {
+    return [{ original: "", translated: cleaned }];
+  }
+  return [];
+}
+
+async function translateImageWithGemini(dataUrl, settings, glossaryMap) {
+  const { apiKey, model } = getActiveAiConfig(settings);
+  if (!apiKey) throw new Error("请先填写 Gemini API Key");
+  const match = dataUrl.match(/^data:(image\/[^;]+);base64,(.+)$/i);
+  if (!match) throw new Error("无效的图片数据格式");
+  const [, mimeType, base64Data] = match;
+  const modelName = model || "gemini-2.0-flash";
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+  const resp = await fetchWithTimeout(
+    endpoint,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { text: buildImagePrompt(settings.targetLang, glossaryMap) },
+              { inlineData: { mimeType, data: base64Data } }
+            ]
+          }
+        ],
+        generationConfig: {
+          temperature: 0.1,
+          responseMimeType: "application/json"
+        }
+      })
+    },
+    30000
+  );
+  if (!resp.ok) {
+    throw new Error(formatApiHttpError("Gemini 视觉 API", resp.status, await resp.text()));
+  }
+  const data = await resp.json();
+  const content = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  return parseImageJsonResult(content);
+}
+
+async function translateImageWithOpenAIVision(dataUrl, endpoint, apiKey, model, settings, glossaryMap) {
+  const headers = { "Content-Type": "application/json" };
+  if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
+
+  const resp = await fetchWithTimeout(
+    endpoint,
+    {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        model,
+        temperature: 0.1,
+        messages: [
+          {
+            role: "user",
+            content: [
+              { type: "text", text: buildImagePrompt(settings.targetLang, glossaryMap) },
+              { type: "image_url", image_url: { url: dataUrl } }
+            ]
+          }
+        ]
+      })
+    },
+    30000
+  );
+  if (!resp.ok) {
+    throw new Error(formatApiHttpError("视觉翻译接口", resp.status, await resp.text()));
+  }
+  const data = await resp.json();
+  const content = data?.choices?.[0]?.message?.content || "";
+  return parseImageJsonResult(content);
+}
+
+async function handleTranslateImage(payload) {
+  const settings = await getSettings();
+  const glossaryMap = buildMergedGlossary(settings);
+  const dataUrl = payload.dataUrl || (await fetchImageAsDataUrl(payload.srcUrl));
+  const eng = settings.engine;
+
+  // 1. Gemini 原生多模态
+  if (eng === "gemini" && settings.aiProfiles?.gemini?.apiKey) {
+    const items = await translateImageWithGemini(dataUrl, settings, glossaryMap);
+    return { items, engineUsed: "gemini" };
+  }
+
+  // 2. 智谱（自动切免费视觉模型 glm-4v-flash）
+  if (eng === "zhipu" && settings.aiProfiles?.zhipu?.apiKey) {
+    const prof = settings.aiProfiles.zhipu;
+    const visionModel = /v/i.test(prof.model || "") ? prof.model : "glm-4v-flash";
+    const items = await translateImageWithOpenAIVision(
+      dataUrl,
+      resolveChatCompletionsUrl(prof.baseUrl),
+      prof.apiKey,
+      visionModel,
+      settings,
+      glossaryMap
+    );
+    return { items, engineUsed: `zhipu (${visionModel})` };
+  }
+
+  // 3. 硅基流动（自动切免费视觉模型 Qwen2.5-VL）
+  if (eng === "siliconflow" && settings.aiProfiles?.siliconflow?.apiKey) {
+    const prof = settings.aiProfiles.siliconflow;
+    const visionModel = /vl|vision/i.test(prof.model || "") ? prof.model : "Qwen/Qwen2.5-VL-7B-Instruct";
+    const items = await translateImageWithOpenAIVision(
+      dataUrl,
+      resolveChatCompletionsUrl(prof.baseUrl),
+      prof.apiKey,
+      visionModel,
+      settings,
+      glossaryMap
+    );
+    return { items, engineUsed: `siliconflow (${visionModel})` };
+  }
+
+  // 4. OpenAI / 自定义兼容接口（支持 GPT-4o-mini 等视觉模型）
+  if (eng === "openai" && settings.aiProfiles?.openai?.apiKey) {
+    const prof = settings.aiProfiles.openai;
+    const items = await translateImageWithOpenAIVision(
+      dataUrl,
+      resolveChatCompletionsUrl(prof.baseUrl),
+      prof.apiKey,
+      prof.model || "gpt-4o-mini",
+      settings,
+      glossaryMap
+    );
+    return { items, engineUsed: prof.model || "openai" };
+  }
+
+  // 5. 若其他已配置了视觉 Key（优先智谱 glm-4v-flash / Gemini / OpenAI）
+  if (settings.aiProfiles?.zhipu?.apiKey) {
+    const prof = settings.aiProfiles.zhipu;
+    const items = await translateImageWithOpenAIVision(
+      dataUrl,
+      resolveChatCompletionsUrl(prof.baseUrl),
+      prof.apiKey,
+      "glm-4v-flash",
+      settings,
+      glossaryMap
+    );
+    return { items, engineUsed: "zhipu (glm-4v-flash)" };
+  }
+  if (settings.aiProfiles?.gemini?.apiKey) {
+    const tempSettings = { ...settings, engine: "gemini" };
+    const items = await translateImageWithGemini(dataUrl, tempSettings, glossaryMap);
+    return { items, engineUsed: "gemini" };
+  }
+
+  // 6. 免 Key 开源视觉 AI 兜底（Pollinations）
+  const items = await translateImageWithOpenAIVision(
+    dataUrl,
+    "https://text.pollinations.ai/openai/v1/chat/completions",
+    "",
+    "openai",
+    settings,
+    glossaryMap
+  );
+  return { items, engineUsed: "pollinations-vision" };
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "TRANSLATE_BATCH") {
     handleTranslateBatch(message.texts || [])
       .then((res) => sendResponse({ ok: true, ...res }))
       .catch((err) => sendResponse({ ok: false, error: err.message || String(err) }));
+    return true;
+  }
+
+  if (message.type === "TRANSLATE_IMAGE") {
+    handleTranslateImage(message)
+      .then((res) => sendResponse({ ok: true, ...res }))
+      .catch((err) => {
+        const msg = err?.name === "AbortError" ? "图片识别超时，建议在配置页填入免费智谱 Key（自动调用 glm-4v-flash）或 Gemini Key" : err.message || String(err);
+        sendResponse({ ok: false, error: msg });
+      });
+    return true;
+  }
+
+  if (message.type === "CAPTURE_VISIBLE_TAB") {
+    const winId = sender.tab?.windowId;
+    chrome.tabs.captureVisibleTab(winId, { format: "jpeg", quality: 88 }, (dataUrl) => {
+      if (chrome.runtime.lastError || !dataUrl) {
+        sendResponse({ ok: false, error: chrome.runtime.lastError?.message || "截屏失败" });
+      } else {
+        sendResponse({ ok: true, dataUrl });
+      }
+    });
     return true;
   }
 

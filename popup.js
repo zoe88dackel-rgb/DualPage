@@ -9,6 +9,7 @@ const aiModel = document.getElementById("aiModel");
 const saveAiBtn = document.getElementById("saveAiBtn");
 const testEngineBtn = document.getElementById("testEngineBtn");
 const selectionCheck = document.getElementById("selectionCheck");
+const imageTranslateCheck = document.getElementById("imageTranslateCheck");
 const glossaryCheck = document.getElementById("glossaryCheck");
 const floatingBtnCheck = document.getElementById("floatingBtnCheck");
 const autoDomainCheck = document.getElementById("autoDomainCheck");
@@ -147,6 +148,7 @@ async function init() {
     aiBaseUrl.value = currentSettings.ai?.baseUrl || "https://api.deepseek.com/v1";
     aiModel.value = currentSettings.ai?.model || "deepseek-chat";
     selectionCheck.checked = currentSettings.enableSelectionTranslate !== false;
+    if (imageTranslateCheck) imageTranslateCheck.checked = currentSettings.enableImageTranslate !== false;
     glossaryCheck.checked = currentSettings.useGlossary !== false;
     floatingBtnCheck.checked = currentSettings.showFloatingBtn !== false;
     customGlossaryInput.value = currentSettings.customGlossary || "";
@@ -255,6 +257,13 @@ selectionCheck.addEventListener("change", () => {
   persistAndSync(
     { enableSelectionTranslate: selectionCheck.checked },
     selectionCheck.checked ? "已开启划词即译" : "已关闭划词即译"
+  );
+});
+
+imageTranslateCheck?.addEventListener("change", () => {
+  persistAndSync(
+    { enableImageTranslate: imageTranslateCheck.checked },
+    imageTranslateCheck.checked ? "已开启图片悬停译图" : "已关闭图片悬停译图"
   );
 });
 

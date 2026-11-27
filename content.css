@@ -275,6 +275,149 @@
   cursor: pointer;
 }
 
+/* 图片悬停「译图」轻胶囊 */
+#lwt-img-badge {
+  all: unset;
+  box-sizing: border-box !important;
+  position: fixed !important;
+  z-index: 2147483646 !important;
+  height: 26px !important;
+  padding: 0 10px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.32) !important;
+  background: rgba(24, 24, 28, 0.84) !important;
+  backdrop-filter: blur(14px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(180%) !important;
+  color: #FFFFFF !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28) !important;
+}
+
+#lwt-img-badge:hover {
+  background: rgba(0, 122, 255, 0.94) !important;
+}
+
+/* 框选截屏遮罩层 */
+#lwt-region-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483647 !important;
+  background: rgba(0, 0, 0, 0.28) !important;
+  cursor: crosshair !important;
+  user-select: none !important;
+}
+
+#lwt-region-hint {
+  position: fixed !important;
+  top: 20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  padding: 8px 16px !important;
+  border-radius: 999px !important;
+  background: rgba(24, 24, 28, 0.9) !important;
+  color: #FFFFFF !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif !important;
+  pointer-events: none !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25) !important;
+}
+
+#lwt-region-box {
+  position: fixed !important;
+  display: none;
+  border: 2px solid #007AFF !important;
+  background: rgba(0, 122, 255, 0.14) !important;
+  border-radius: 6px !important;
+  pointer-events: none !important;
+}
+
+/* 清晰结构化图片译文结果卡片 */
+#lwt-image-card {
+  position: fixed !important;
+  z-index: 2147483647 !important;
+  width: 356px !important;
+  max-width: 92vw !important;
+  border-radius: 16px !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  border: 0.5px solid rgba(0, 0, 0, 0.1) !important;
+  backdrop-filter: blur(22px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(180%) !important;
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.22) !important;
+  color: #1C1C1E !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif !important;
+  overflow: hidden !important;
+}
+
+.lwt-ic-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 9px 12px !important;
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+.lwt-ic-title {
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  color: #1C1C1E !important;
+}
+
+.lwt-ic-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.lwt-ic-body {
+  padding: 12px 14px 14px !important;
+  max-height: 360px !important;
+  overflow-y: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+.lwt-ic-loading,
+.lwt-ic-empty {
+  font-size: 13px !important;
+  color: #6E6E73 !important;
+  text-align: center !important;
+  padding: 12px 0 !important;
+}
+
+.lwt-ic-row {
+  padding-bottom: 8px !important;
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+.lwt-ic-row:last-child {
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
+}
+
+.lwt-ic-orig {
+  font-size: 12px !important;
+  color: #6E6E73 !important;
+  line-height: 1.45 !important;
+  margin-bottom: 3px !important;
+}
+
+.lwt-ic-trans {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #1C1C1E !important;
+  line-height: 1.55 !important;
+  word-break: break-word !important;
+}
+
 /* 划词翻译卡片 */
 #lwt-selection-card {
   position: fixed;
@@ -394,10 +537,22 @@
     border-left-color: rgba(255, 255, 255, 0.16) !important;
   }
   #lwt-quick-menu,
-  #lwt-selection-card {
-    background: rgba(38, 38, 40, 0.9);
-    border-color: rgba(255, 255, 255, 0.12);
-    color: #F2F2F7;
+  #lwt-selection-card,
+  #lwt-image-card {
+    background: rgba(32, 32, 36, 0.94) !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
+    color: #F2F2F7 !important;
+  }
+  .lwt-ic-title,
+  .lwt-ic-trans {
+    color: #F2F2F7 !important;
+  }
+  .lwt-ic-orig {
+    color: #AEAEB2 !important;
+  }
+  .lwt-ic-head,
+  .lwt-ic-row {
+    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
   }
   .lwt-menu-item {
     color: #F2F2F7;

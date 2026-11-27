@@ -1,12 +1,13 @@
 {
   "manifest_version": 3,
   "name": "DualPage",
-  "version": "2.2.0",
-  "description": "DualPage — iOS 风格全网页实时翻译器：支持整段双语对照、可视区优先翻译、划词即译、可拖动毛玻璃悬浮球、自定义术语表与免 Key/自定义 AI 双引擎。",
+  "version": "2.3.0",
+  "description": "DualPage — 轻量、零服务器的实时双语网页与图片翻译器：支持整段双语对照、划词沉浸对照、图片/框选截屏译图与免 Key/自定义 AI 双引擎。",
   "permissions": [
     "storage",
     "activeTab",
-    "scripting"
+    "scripting",
+    "contextMenus"
   ],
   "host_permissions": [
     "<all_urls>"

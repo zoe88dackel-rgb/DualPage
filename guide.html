@@ -969,12 +969,12 @@
   <section class="hero">
     <div class="inner">
       <img class="hero-icon hero-anim delay-1" src="icons/logo256.png" alt="DualPage Logo" />
-      <div class="hero-eyebrow hero-anim delay-2">DualPage 2.2 · 浏览器实时翻译扩展</div>
+      <div class="hero-eyebrow hero-anim delay-2">DualPage 2.3 · 浏览器实时翻译扩展</div>
       <h1 class="hero-anim delay-2">双面阅读，如原生般自然。</h1>
-      <p class="hero-sub hero-anim delay-3">装好即用。整段无感双语对照、划词即译，纯本地零服务器。</p>
+      <p class="hero-sub hero-anim delay-3">装好即用。整段无感双语对照、划词即译、图片与框选译图，纯本地零服务器。</p>
       <div class="hero-actions hero-anim delay-4">
         <a class="btn-apple" href="#install">30 秒安装指南</a>
-        <a class="link-apple" href="#changelog">查看 v2.2 更新日志 ›</a>
+        <a class="link-apple" href="#changelog">查看 v2.3 更新日志 ›</a>
       </div>
 
       <!-- 交互式实时效果预览 -->
@@ -1074,9 +1074,9 @@
         </div>
         <div class="bento-card span-6">
           <div>
-            <div class="bento-tag">划词与悬浮球</div>
-            <h3>指哪翻哪，一球控全局。</h3>
-            <p>选中外语弹出「划词翻译 | 沉浸对照」；悬浮球可拖动贴边，点 <code>⋯</code> 切模式或自动翻译本站。</p>
+            <div class="bento-tag">划词 · 悬停译图 · Alt+I 框选</div>
+            <h3>文字和图片，指哪翻哪。</h3>
+            <p>划选文字弹出「划词翻译 | 沉浸对照」；悬停或右键图片点「译图」，或按 <code>Alt + I</code> 框选任意区域，清晰逐条呈现图片译文。</p>
           </div>
         </div>
         <div class="bento-card span-6">
@@ -1146,9 +1146,9 @@
         <div class="spec-row">
           <div>
             <div class="spec-title">常用快捷键</div>
-            <div class="spec-desc"><code>Alt + T</code> 开关翻译 · <code>Esc</code> 关闭弹窗 · 按住悬浮球拖动</div>
+            <div class="spec-desc"><code>Alt + T</code> 开关网页翻译 · <code>Alt + I</code> 框选截屏译图 · <code>Esc</code> 关闭弹窗</div>
           </div>
-          <span class="kbd">Alt + T</span>
+          <span class="kbd">Alt+T / Alt+I</span>
         </div>
       </div>
     </div>
@@ -1165,23 +1165,23 @@
         <article class="release-card">
           <div class="release-head">
             <div class="release-ver">
-              <span>v2.2</span>
+              <span>v2.3</span>
               <span class="badge-latest">当前版本</span>
             </div>
             <span class="release-date">2026-11-27</span>
           </div>
           <ul class="release-list">
-            <li><strong>划词沉浸式对照</strong>：选中外语弹出 <code>划词翻译 | 沉浸对照</code> 双按钮条。</li>
-            <li><strong>极速引擎</strong>：首屏 12 段优先出字 + 5 路并发 + 5,000 条本地缓存。</li>
-            <li><strong>独立配置中心</strong>：多平台独立存 Key、测速与 CSV/Excel 术语表模板。</li>
-            <li><strong>视觉与交互</strong>：手动深浅色切换、强样式隔离与双层矢量悬浮球。</li>
+            <li><strong>清晰图片文字翻译</strong>：悬停图片右上角浮现「译图」胶囊，支持右键译图与 <code>Alt + I</code> 任意框选截屏译图，以高清结构化卡片逐条展示原文与译文（告别模糊叠字）。</li>
+            <li><strong>多视觉引擎自动适配</strong>：支持免 Key 开源视觉 AI，填入免费智谱 Key 自动调用 <code>glm-4v-flash</code>，填入硅基流动自动调用 <code>Qwen2.5-VL</code>，同时支持 Gemini 与 OpenAI 视觉模型。</li>
+            <li><strong>浏览器右键菜单集成</strong>：支持右键一键翻译网页、翻译选中文字、翻译图片文字与框选截屏译图。</li>
           </ul>
         </article>
 
         <div class="spec-list">
           <details>
-            <summary>查看历史版本 (v1.0 - v2.1)</summary>
+            <summary>查看历史版本 (v1.0 - v2.2)</summary>
             <div class="faq-body">
+              <strong>v2.2</strong>：划词沉浸对照、首屏 12 段优先 + 5 路并发 + 5,000 条本地缓存、独立 API 配置页与 CSV/Excel 术语表模板、深浅色手动切换。<br /><br />
               <strong>v2.1</strong>：定名 DualPage 并启用双层卡片 Logo；重构整段双语对照；新增免费 AI 与路径容错。<br /><br />
               <strong>v2.0</strong>：划词气泡、可拖动吸边悬浮球、免刷新热注入与自定义术语表。<br /><br />
               <strong>v1.0</strong>：首个版本，支持动态网页实时翻译与站点自动翻译。
@@ -1216,7 +1216,7 @@
   </section>
 
   <footer>
-    DualPage v2.2 · 你的 API Key 与自定义术语表仅保存在本机浏览器中，不上传至任何第三方服务器。
+    DualPage v2.3 · 你的 API Key 与自定义术语表仅保存在本机浏览器中，不上传至任何第三方服务器。
   </footer>
 
   <div id="guideToast">已复制到剪贴板</div>
