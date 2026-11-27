@@ -338,12 +338,17 @@ async function translateWithPollinations(texts, settings, glossaryMap) {
 function buildAiPrompt(targetLang, glossaryMap) {
   const langName =
     targetLang === "zh-CN" ? "简体中文" : targetLang === "en" ? "English" : targetLang;
-  const entries = Object.entries(glossaryMap).slice(0, 24);
+  const entries = Object.entries(glossaryMap).slice(0, 28);
   const glossaryText =
     entries.length > 0
-      ? `请严格参考术语表：${entries.map(([k, v]) => `${k}=>${v}`).join("；")}。`
+      ? `\n术语对照（优先采用）：${entries.map(([k, v]) => `${k}=>${v}`).join("；")}。`
       : "";
-  return `你是专业网页翻译器。请将输入的 JSON 字符串数组逐项精准翻译为${langName}。${glossaryText}要求：仅返回合法的 JSON 字符串数组，长度与输入完全一致，不要输出任何额外说明或 Markdown 代码块。`;
+  return `你是资深母语本地化翻译专家。请将输入的 JSON 字符串数组逐项翻译为自然、地道的${langName}。${glossaryText}
+翻译原则：
+1. 拒绝生硬直译与翻译腔，结合同批次上下文语境意译，使译文读起来像原生${langName}网页；
+2. 按钮、菜单、导航等短词保持简洁精炼；新闻标题与正文符合${langName}表达习惯；
+3. 专有名词、品牌名、代码标识符、型号、数字与单位保持准确，不要强行音译常见品牌；
+4. 仅返回合法的 JSON 字符串数组，元素数量和顺序必须与输入完全一致，不要输出任何额外解释或 Markdown 代码块。`;
 }
 
 function parseJsonArrayOutput(rawText, fallbackTexts) {

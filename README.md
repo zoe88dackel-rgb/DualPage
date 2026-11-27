@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://github.com/zoe88dackel-rgb/DualPage/releases/latest/download/DualPage-latest.zip">
-    <img src="https://img.shields.io/badge/一键下载最新安装包-v2.3.1%20ZIP-0071E3?style=for-the-badge&logo=github" alt="一键下载 DualPage 最新安装包" />
+    <img src="https://img.shields.io/badge/一键下载最新安装包-v2.3.2%20ZIP-0071E3?style=for-the-badge&logo=github" alt="一键下载 DualPage 最新安装包" />
   </a>
   <a href="https://github.com/zoe88dackel-rgb/DualPage/releases/latest">
     <img src="https://img.shields.io/badge/查看历史版本-Releases-1D1D1F?style=for-the-badge" alt="查看 Releases" />

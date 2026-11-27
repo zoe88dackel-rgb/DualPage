@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "DualPage",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "DualPage — 轻量、零服务器的实时双语网页与图片翻译器：支持整段双语对照、划词沉浸对照、图片/框选截屏译图与免 Key/自定义 AI 双引擎。",
   "permissions": [
     "storage",

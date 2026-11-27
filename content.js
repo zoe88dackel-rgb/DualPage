@@ -122,6 +122,30 @@
     return rect.bottom >= -260 && rect.top <= window.innerHeight + 260;
   }
 
+  let observedShadowRoots = new WeakSet();
+
+  function ensureShadowSupport(sr) {
+    if (!sr) return;
+    if (!sr.querySelector("style[data-dp-shadow]")) {
+      try {
+        const st = document.createElement("style");
+        st.setAttribute("data-dp-shadow", "1");
+        st.textContent = `.lwt-bilingual-tag{font-weight:400;opacity:.86}.lwt-bi-block{display:block;margin-top:4px;line-height:1.55}.lwt-bi-inline{display:inline;margin-left:4px}`;
+        sr.appendChild(st);
+      } catch {
+        // 忽略只读 ShadowRoot
+      }
+    }
+    if (mutationObserver && !observedShadowRoots.has(sr)) {
+      observedShadowRoots.add(sr);
+      try {
+        mutationObserver.observe(sr, { childList: true, subtree: true, characterData: true });
+      } catch {
+        // 忽略观察异常
+      }
+    }
+  }
+
   function collectTextNodes(root) {
     const nodes = [];
     if (!root) return nodes;
@@ -131,15 +155,23 @@
       }
       return nodes;
     }
-    if (root.nodeType !== Node.ELEMENT_NODE && root.nodeType !== Node.DOCUMENT_NODE) {
+    if (
+      root.nodeType !== Node.ELEMENT_NODE &&
+      root.nodeType !== Node.DOCUMENT_NODE &&
+      root.nodeType !== Node.DOCUMENT_FRAGMENT_NODE
+    ) {
       return nodes;
     }
     if (root.nodeType === Node.ELEMENT_NODE && isSkippedElement(root)) {
       return nodes;
     }
 
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, {
       acceptNode(node) {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          if (isSkippedElement(node)) return NodeFilter.FILTER_REJECT;
+          return node.shadowRoot ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+        }
         const parent = node.parentElement;
         if (!parent || isSkippedElement(parent)) return NodeFilter.FILTER_REJECT;
         if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
@@ -147,22 +179,40 @@
       }
     });
 
+    if (root.nodeType === Node.ELEMENT_NODE && root.shadowRoot) {
+      ensureShadowSupport(root.shadowRoot);
+      nodes.push(...collectTextNodes(root.shadowRoot));
+    }
+
     let curr;
     while ((curr = walker.nextNode())) {
-      nodes.push(curr);
+      if (curr.nodeType === Node.ELEMENT_NODE && curr.shadowRoot) {
+        ensureShadowSupport(curr.shadowRoot);
+        nodes.push(...collectTextNodes(curr.shadowRoot));
+      } else if (curr.nodeType === Node.TEXT_NODE) {
+        nodes.push(curr);
+      }
     }
     return nodes;
   }
 
   function collectPlaceholderInputs(root) {
     if (!root || typeof root.querySelectorAll !== "function") return [];
-    return Array.from(root.querySelectorAll("input[placeholder], textarea[placeholder]")).filter(
+    const list = Array.from(root.querySelectorAll("input[placeholder], textarea[placeholder]")).filter(
       (el) => !el.closest("#lwt-floating-root, #lwt-selection-card")
     );
+    const hosts = root.querySelectorAll("*");
+    for (const el of hosts) {
+      if (el.shadowRoot && !isSkippedElement(el)) {
+        ensureShadowSupport(el.shadowRoot);
+        list.push(...collectPlaceholderInputs(el.shadowRoot));
+      }
+    }
+    return list;
   }
 
   function getCacheKey(text) {
-    const engine = currentSettings?.engine || "edge";
+    const engine = currentSettings?.engine || "google";
     const lang = currentSettings?.targetLang || "zh-CN";
     const gloss = currentSettings?.useGlossary ? "1" : "0";
     const customLen = (currentSettings?.customGlossary || "").length;
@@ -249,13 +299,33 @@
 
   function collectBilingualBlocks(root) {
     const blocks = [];
-    if (!root || root.nodeType !== Node.ELEMENT_NODE && root.nodeType !== Node.DOCUMENT_NODE) return blocks;
+    if (
+      !root ||
+      (root.nodeType !== Node.ELEMENT_NODE &&
+        root.nodeType !== Node.DOCUMENT_NODE &&
+        root.nodeType !== Node.DOCUMENT_FRAGMENT_NODE)
+    ) {
+      return blocks;
+    }
     const scope = root.nodeType === Node.DOCUMENT_NODE ? root.body : root;
     if (!scope) return blocks;
+
+    if (scope.nodeType === Node.ELEMENT_NODE && scope.shadowRoot && !isSkippedElement(scope)) {
+      ensureShadowSupport(scope.shadowRoot);
+      blocks.push(...collectBilingualBlocks(scope.shadowRoot));
+    }
 
     const candidates = [];
     if (scope.matches && scope.matches(BLOCK_SELECTOR)) candidates.push(scope);
     scope.querySelectorAll(BLOCK_SELECTOR).forEach((el) => candidates.push(el));
+
+    // 递归收集内部 open Shadow DOM（如 msn.com、YouTube、新版 Web Components 站点）
+    scope.querySelectorAll("*").forEach((el) => {
+      if (el.shadowRoot && !isSkippedElement(el)) {
+        ensureShadowSupport(el.shadowRoot);
+        blocks.push(...collectBilingualBlocks(el.shadowRoot));
+      }
+    });
 
     const picked = new Set();
     for (const el of candidates) {
@@ -409,7 +479,10 @@
     if (inFlightBatches >= MAX_CONCURRENT_BATCHES) return;
 
     const isTraditionalFree =
-      !currentSettings || currentSettings.engine === "edge" || currentSettings.engine === "google";
+      !currentSettings ||
+      currentSettings.engine === "google" ||
+      currentSettings.engine === "browser" ||
+      currentSettings.engine === "edge";
     const isPollinations = currentSettings?.engine === "pollinations";
     // 首屏第一批采用极速小包（12 条），让可见内容 200ms 内先出字，后续走 5 路并发大包
     const isFirstWave = !hasSentFirstBatch;
@@ -623,6 +696,7 @@
       intersectionObserver = null;
     }
     observedElements = new WeakSet();
+    observedShadowRoots = new WeakSet();
   }
 
   function restoreOriginalPage() {
