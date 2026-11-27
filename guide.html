@@ -3,79 +3,73 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DualPage — 网页实时翻译，如原生般自然</title>
+  <title>DualPage - 实时双语网页翻译指南</title>
   <link rel="icon" type="image/png" href="icons/icon48.png" />
   <style>
+    /* 主题色彩系统：避免纯黑纯白，全页锁定统一浅色或深色层级 */
     :root {
-      --bg-white: #FFFFFF;
-      --bg-gray: #F5F5F7;
-      --surface: #FFFFFF;
-      --surface-alt: #F5F5F7;
-      --nav-bg: rgba(255, 255, 255, 0.78);
-      --text: #1D1D1F;
-      --text-sec: #6E6E73;
-      --text-tert: #86868B;
-      --sep: rgba(0, 0, 0, 0.08);
-      --blue: #0071E3;
-      --blue-hover: #0077ED;
-      --blue-soft: rgba(0, 113, 227, 0.1);
-      --green: #34C759;
-      --radius-xl: 28px;
-      --radius-lg: 20px;
-      --radius-md: 14px;
+      --bg-page: #F7F8FA;
+      --bg-band: #EFF2F6;
+      --surface: #FCFCFD;
+      --surface-elevated: #FFFFFF;
+      --surface-tint: #EAF2FC;
+      --surface-muted: #EBEEF3;
+      --nav-bg: rgba(247, 248, 250, 0.82);
+      --text-primary: #16181D;
+      --text-secondary: #525866;
+      --text-tertiary: #767D8C;
+      --border: rgba(22, 24, 29, 0.09);
+      --border-strong: rgba(22, 24, 29, 0.16);
+      --accent: #0068D6;
+      --accent-hover: #0058B8;
+      --accent-soft: rgba(0, 104, 214, 0.1);
+      --shadow-card: 0 16px 40px rgba(15, 23, 42, 0.06);
+      --shadow-float: 0 20px 48px rgba(15, 23, 42, 0.12);
+      --radius-card: 20px;
+      --radius-input: 10px;
+      --radius-pill: 999px;
     }
 
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
-        --bg-white: #000000;
-        --bg-gray: #111113;
-        --surface: #1C1C1E;
-        --surface-alt: #242426;
-        --nav-bg: rgba(22, 22, 23, 0.78);
-        --text: #F5F5F7;
-        --text-sec: #A1A1A6;
-        --text-tert: #86868B;
-        --sep: rgba(255, 255, 255, 0.1);
-        --blue: #2997FF;
-        --blue-hover: #40A2FF;
-        --blue-soft: rgba(41, 151, 255, 0.16);
-        --green: #30D158;
+        --bg-page: #0D0F12;
+        --bg-band: #12151B;
+        --surface: #171B22;
+        --surface-elevated: #1E232D;
+        --surface-tint: #132238;
+        --surface-muted: #222733;
+        --nav-bg: rgba(13, 15, 18, 0.82);
+        --text-primary: #F1F3F7;
+        --text-secondary: #A2AAB8;
+        --text-tertiary: #7A8394;
+        --border: rgba(241, 243, 247, 0.09);
+        --border-strong: rgba(241, 243, 247, 0.18);
+        --accent: #3B9EFF;
+        --accent-hover: #5BB0FF;
+        --accent-soft: rgba(59, 158, 255, 0.16);
+        --shadow-card: 0 18px 44px rgba(0, 0, 0, 0.34);
+        --shadow-float: 0 24px 56px rgba(0, 0, 0, 0.5);
       }
     }
 
     :root[data-theme="dark"] {
-      --bg-white: #000000;
-      --bg-gray: #111113;
-      --surface: #1C1C1E;
-      --surface-alt: #242426;
-      --nav-bg: rgba(22, 22, 23, 0.78);
-      --text: #F5F5F7;
-      --text-sec: #A1A1A6;
-      --text-tert: #86868B;
-      --sep: rgba(255, 255, 255, 0.1);
-      --blue: #2997FF;
-      --blue-hover: #40A2FF;
-      --blue-soft: rgba(41, 151, 255, 0.16);
-      --green: #30D158;
-    }
-
-    .theme-btn {
-      width: 30px;
-      height: 30px;
-      border-radius: 999px;
-      border: 0.5px solid var(--sep);
-      background: var(--surface-alt);
-      color: var(--text);
-      font-size: 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: transform 0.18s ease, background 0.2s ease;
-    }
-
-    .theme-btn:hover {
-      transform: scale(1.08);
+      --bg-page: #0D0F12;
+      --bg-band: #12151B;
+      --surface: #171B22;
+      --surface-elevated: #1E232D;
+      --surface-tint: #132238;
+      --surface-muted: #222733;
+      --nav-bg: rgba(13, 15, 18, 0.82);
+      --text-primary: #F1F3F7;
+      --text-secondary: #A2AAB8;
+      --text-tertiary: #7A8394;
+      --border: rgba(241, 243, 247, 0.09);
+      --border-strong: rgba(241, 243, 247, 0.18);
+      --accent: #3B9EFF;
+      --accent-hover: #5BB0FF;
+      --accent-soft: rgba(59, 158, 255, 0.16);
+      --shadow-card: 0 18px 44px rgba(0, 0, 0, 0.34);
+      --shadow-float: 0 24px 56px rgba(0, 0, 0, 0.5);
     }
 
     * {
@@ -91,222 +85,462 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
-      background: var(--bg-white);
-      color: var(--text);
-      line-height: 1.5;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
+      background: var(--bg-page);
+      color: var(--text-primary);
+      line-height: 1.6;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
 
-    /* Apple 顶部全局毛玻璃导航栏 */
+    /* 顶部单行导航（高度 60px） */
     .nav {
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 40;
+      height: 60px;
       background: var(--nav-bg);
-      backdrop-filter: saturate(180%) blur(20px);
-      -webkit-backdrop-filter: saturate(180%) blur(20px);
-      border-bottom: 0.5px solid var(--sep);
-    }
-
-    .scroll-progress {
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      height: 2px;
-      width: 0%;
-      background: linear-gradient(90deg, #3898FF, var(--blue));
-      transition: width 0.08s linear;
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--border);
     }
 
     .nav-inner {
-      max-width: 1020px;
+      max-width: 1160px;
+      height: 100%;
       margin: 0 auto;
-      height: 52px;
       padding: 0 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 16px;
     }
 
     .brand {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 9px;
-      font-size: 17px;
-      font-weight: 600;
-      letter-spacing: -0.3px;
-      color: var(--text);
+      gap: 10px;
       text-decoration: none;
+      color: var(--text-primary);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      white-space: nowrap;
     }
 
     .brand-icon {
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       border-radius: 7px;
-      object-fit: contain;
       display: block;
     }
 
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 24px;
-      font-size: 12.5px;
+      gap: 22px;
+      font-size: 13.5px;
+      white-space: nowrap;
     }
 
     .nav-links a {
-      color: var(--text-sec);
+      color: var(--text-secondary);
       text-decoration: none;
-      transition: color 0.18s ease;
+      font-weight: 500;
+      transition: color 0.16s ease;
     }
 
     .nav-links a:hover {
-      color: var(--text);
+      color: var(--text-primary);
     }
 
-    .nav-cta {
-      background: var(--blue);
+    .theme-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.16s ease, border-color 0.16s ease;
+    }
+
+    .theme-btn:hover {
+      transform: scale(1.06);
+      border-color: var(--border-strong);
+    }
+
+    .theme-btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 42px;
+      padding: 0 22px;
+      border-radius: var(--radius-pill);
+      border: none;
+      background: var(--accent);
       color: #FFFFFF !important;
-      padding: 5px 13px;
-      border-radius: 999px;
-      font-weight: 500;
+      font-size: 14.5px;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background-color 0.16s ease, transform 0.14s ease;
     }
 
-    .nav-cta:hover {
-      background: var(--blue-hover);
+    .btn-primary:hover {
+      background: var(--accent-hover);
     }
 
-    /* 通用区块容器 */
-    .band {
-      padding: 84px 24px;
+    .btn-primary:active {
+      transform: scale(0.98);
     }
 
-    .band-gray {
-      background: var(--bg-gray);
+    .btn-nav {
+      height: 34px;
+      padding: 0 15px;
+      font-size: 13px;
     }
 
-    .inner {
-      max-width: 1020px;
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 42px;
+      padding: 0 20px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text-primary);
+      font-size: 14.5px;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: border-color 0.16s ease, transform 0.14s ease, background-color 0.16s ease;
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-elevated);
+      border-color: var(--accent);
+    }
+
+    .btn-secondary:active {
+      transform: scale(0.98);
+    }
+
+    /* 通用布局容器 */
+    .container {
+      max-width: 1160px;
       margin: 0 auto;
+      padding: 0 24px;
     }
 
-    /* Hero 展示区与苹果风柔和入场动效 */
+    .band {
+      padding: 80px 0;
+    }
+
+    .band-alt {
+      background: var(--bg-band);
+    }
+
+    .sec-header {
+      max-width: 620px;
+      margin-bottom: 40px;
+    }
+
+    .sec-header h2 {
+      font-size: clamp(26px, 3.4vw, 36px);
+      font-weight: 700;
+      letter-spacing: -0.7px;
+      line-height: 1.18;
+      margin-bottom: 10px;
+    }
+
+    .sec-header p {
+      font-size: 16px;
+      color: var(--text-secondary);
+      max-width: 58ch;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      margin-bottom: 16px;
+    }
+
+    /* ==================== Section 1: 首屏左右分栏交互沙盒 ==================== */
     .hero {
-      padding: 72px 24px 88px;
-      text-align: center;
+      min-height: calc(100dvh - 60px);
+      padding: 48px 0 64px;
+      display: flex;
+      align-items: center;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 5fr 7fr;
+      gap: 44px;
+      align-items: center;
+    }
+
+    .hero-copy h1 {
+      font-size: clamp(34px, 4.2vw, 50px);
+      font-weight: 800;
+      letter-spacing: -1.2px;
+      line-height: 1.12;
+      margin-bottom: 18px;
+    }
+
+    .hero-sub {
+      font-size: 16.5px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      max-width: 44ch;
+      margin-bottom: 28px;
+    }
+
+    .hero-ctas {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* 右侧真实交互体验窗 */
+    .sandbox {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-float);
+      overflow: hidden;
       position: relative;
+    }
+
+    .sandbox-top {
+      height: 46px;
+      padding: 0 16px;
+      background: var(--surface-muted);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .win-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .win-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border-strong);
+    }
+
+    .sandbox-hint {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .seg-group {
+      display: inline-flex;
+      padding: 2px;
+      background: var(--bg-page);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      gap: 2px;
+    }
+
+    .seg-item {
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 11px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: background-color 0.16s ease, color 0.16s ease;
+    }
+
+    .seg-item.active {
+      background: var(--accent);
+      color: #FFFFFF;
+    }
+
+    .sandbox-stage {
+      padding: 26px 28px 66px;
+      position: relative;
+      min-height: 310px;
+      transition: opacity 0.16s ease, transform 0.16s ease;
+    }
+
+    .sandbox-stage.switching {
+      opacity: 0.25;
+      transform: translateY(3px);
+    }
+
+    .article-tag {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+    }
+
+    .demo-heading {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      line-height: 1.35;
+      margin-bottom: 14px;
+    }
+
+    .demo-para {
+      font-size: 14.5px;
+      color: var(--text-secondary);
+      line-height: 1.68;
+      padding: 8px 10px;
+      margin: 0 -10px;
+      border-radius: var(--radius-input);
+      cursor: pointer;
+      border: 1px dashed transparent;
+      transition: background-color 0.16s ease, border-color 0.16s ease;
+    }
+
+    .demo-para:hover {
+      background: var(--accent-soft);
+      border-color: rgba(0, 104, 214, 0.28);
+    }
+
+    .demo-para.selected {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    .demo-trans {
+      display: block;
+      margin-top: 6px;
+      color: var(--text-primary);
+      opacity: 0.84;
+      font-weight: 400;
+    }
+
+    .try-tip {
+      margin-top: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--text-tertiary);
+    }
+
+    /* 沙盒内的划词双按钮浮条演示 */
+    .sandbox-sel-bar {
+      margin-top: 10px;
+      display: inline-flex;
+      align-items: center;
+      height: 32px;
+      border-radius: var(--radius-pill);
+      background: rgba(24, 26, 32, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
       overflow: hidden;
     }
 
-    .hero::before {
-      content: "";
-      position: absolute;
-      top: -120px;
-      left: 50%;
-      width: 680px;
-      height: 420px;
-      transform: translateX(-50%);
-      background: radial-gradient(ellipse at center, rgba(0, 113, 227, 0.12) 0%, rgba(0, 113, 227, 0) 70%);
-      pointer-events: none;
-      animation: heroGlow 7s ease-in-out infinite alternate;
+    .sandbox-sel-bar.hidden {
+      display: none;
     }
 
-    @keyframes heroGlow {
-      from { opacity: 0.65; transform: translateX(-50%) scale(0.96); }
-      to { opacity: 1; transform: translateX(-50%) scale(1.06); }
+    .sb-chip-btn {
+      border: none;
+      background: transparent;
+      color: #F5F7FA;
+      font-size: 12px;
+      font-weight: 600;
+      height: 100%;
+      padding: 0 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    @keyframes appleFadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(22px) scale(0.985);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
+    .sb-chip-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
     }
 
-    .hero-anim {
-      opacity: 0;
-      animation: appleFadeUp 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    .sb-chip-btn + .sb-chip-btn {
+      border-left: 1px solid rgba(255, 255, 255, 0.16);
+      color: #6BB8FF;
     }
 
-    .delay-1 { animation-delay: 0.06s; }
-    .delay-2 { animation-delay: 0.14s; }
-    .delay-3 { animation-delay: 0.22s; }
-    .delay-4 { animation-delay: 0.3s; }
-    .delay-5 { animation-delay: 0.38s; }
-
-    /* 滚动渐入动画（IntersectionObserver 控制） */
-    .reveal {
-      opacity: 0;
-      transform: translateY(26px);
-      transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-      will-change: opacity, transform;
+    .sandbox-popup-card {
+      margin-top: 10px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      font-size: 13.5px;
+      color: var(--text-primary);
+      box-shadow: var(--shadow-card);
     }
 
-    .reveal.is-visible {
-      opacity: 1;
-      transform: translateY(0);
+    .sandbox-popup-card.hidden {
+      display: none;
     }
 
-    /* 卡片悬浮微交互 */
-    .bento-card,
-    .step-card,
-    .release-card {
-      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.25s ease;
-    }
-
-    .bento-card:hover,
-    .step-card:hover,
-    .release-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
-    }
-
-    /* 预览框切换过渡与演示悬浮球 */
-    .demo-body {
-      padding: 28px 32px 58px;
-      position: relative;
-      transition: opacity 0.18s ease, transform 0.18s ease;
-    }
-
+    /* 沙盒右下角悬浮胶囊与快捷菜单 */
     .demo-pill-wrap {
       position: absolute;
       right: 18px;
       bottom: 14px;
       display: inline-flex;
       align-items: center;
-      height: 32px;
-      border-radius: 999px;
-      background: rgba(0, 113, 227, 0.92);
+      height: 34px;
+      border-radius: var(--radius-pill);
+      background: var(--accent);
       color: #FFFFFF;
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: 600;
-      box-shadow: 0 6px 18px rgba(0, 113, 227, 0.32);
+      box-shadow: 0 6px 18px rgba(0, 104, 214, 0.28);
       overflow: hidden;
-      cursor: pointer;
       user-select: none;
-      transition: transform 0.16s ease, background 0.2s ease;
-    }
-
-    .demo-pill-wrap:hover {
-      transform: translateY(-1px);
+      transition: transform 0.16s ease, background-color 0.2s ease;
     }
 
     .demo-pill-wrap.is-orig {
-      background: var(--surface-alt);
-      color: var(--text);
-      border: 0.5px solid var(--sep);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      background: var(--surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+      box-shadow: var(--shadow-card);
     }
 
     .demo-pill-main {
+      border: none;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      height: 100%;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 0 10px 0 6px;
+      padding: 0 10px 0 7px;
+      cursor: pointer;
     }
 
     .demo-pill-logo {
@@ -320,455 +554,448 @@
     }
 
     .demo-pill-more {
-      padding: 0 9px 0 7px;
-      border-left: 0.5px solid rgba(255, 255, 255, 0.28);
-      opacity: 0.9;
+      border: none;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      height: 100%;
+      padding: 0 10px 0 8px;
+      border-left: 1px solid rgba(255, 255, 255, 0.26);
+      cursor: pointer;
     }
 
     .demo-pill-wrap.is-orig .demo-pill-more {
-      border-left-color: var(--sep);
+      border-left-color: var(--border);
     }
 
-    .demo-body.switching {
-      opacity: 0;
-      transform: translateY(4px);
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .hero-anim, .reveal {
-        opacity: 1 !important;
-        transform: none !important;
-        animation: none !important;
-        transition: none !important;
-      }
-      .hero::before { animation: none !important; }
-    }
-
-    .hero-icon {
-      width: 84px;
-      height: 84px;
-      border-radius: 22px;
-      margin: 0 auto 22px;
-      display: block;
-      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.12);
-    }
-
-    .hero-eyebrow {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--blue);
-      letter-spacing: 0.2px;
-      margin-bottom: 10px;
-    }
-
-    .hero h1 {
-      font-size: clamp(38px, 6vw, 60px);
-      font-weight: 700;
-      letter-spacing: -1.4px;
-      line-height: 1.08;
-      margin-bottom: 18px;
-    }
-
-    .hero-sub {
-      font-size: clamp(17px, 2.2vw, 21px);
-      color: var(--text-sec);
-      max-width: 660px;
-      margin: 0 auto 30px;
-      font-weight: 400;
-      line-height: 1.5;
-    }
-
-    .hero-actions {
+    .demo-quick-menu {
+      position: absolute;
+      right: 18px;
+      bottom: 54px;
+      width: 168px;
+      padding: 5px;
+      border-radius: 14px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border-strong);
+      box-shadow: var(--shadow-float);
       display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-bottom: 52px;
+      flex-direction: column;
+      gap: 2px;
+      z-index: 10;
     }
 
-    .btn-apple {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      height: 44px;
-      padding: 0 24px;
-      border-radius: 999px;
-      background: var(--blue);
-      color: #FFFFFF;
-      font-size: 15px;
+    .demo-quick-menu.hidden {
+      display: none;
+    }
+
+    .dqm-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 12px;
       font-weight: 500;
-      text-decoration: none;
-      transition: background 0.18s ease, transform 0.15s ease;
-    }
-
-    .btn-apple:hover {
-      background: var(--blue-hover);
-      transform: translateY(-1px);
-    }
-
-    .link-apple {
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--blue);
-      text-decoration: none;
-    }
-
-    .link-apple:hover {
-      text-decoration: underline;
-    }
-
-    /* 交互式 Apple 风格浏览器预览框 */
-    .demo-frame {
-      max-width: 780px;
-      margin: 0 auto;
-      background: var(--surface);
-      border-radius: var(--radius-xl);
-      border: 0.5px solid var(--sep);
-      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
+      padding: 7px 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      cursor: pointer;
       text-align: left;
     }
 
-    .demo-bar {
-      height: 44px;
-      padding: 0 16px;
-      background: var(--surface-alt);
-      border-bottom: 0.5px solid var(--sep);
+    .dqm-btn:hover {
+      background: var(--accent-soft);
+    }
+
+    .dqm-val {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* ==================== Section 2: 第一次上手三招（交互式选项卡舞台） ==================== */
+    .workflow-layout {
+      display: grid;
+      grid-template-columns: 5fr 7fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .wf-tabs {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .wf-tab {
+      width: 100%;
+      text-align: left;
+      padding: 20px 22px;
+      border-radius: var(--radius-card);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.16s ease;
+    }
+
+    .wf-tab:hover {
+      border-color: var(--border-strong);
+    }
+
+    .wf-tab.active {
+      background: var(--surface-elevated);
+      border-color: var(--accent);
+      box-shadow: var(--shadow-card);
+    }
+
+    .wf-tab-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .wf-tab h3 {
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .wf-key {
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 3px 9px;
+      border-radius: var(--radius-pill);
+    }
+
+    .wf-tab p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .wf-stage {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 32px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .wf-visual {
+      background: var(--bg-page);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      min-height: 190px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .wf-mock-orig {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .wf-mock-trans {
+      font-size: 14.5px;
+      color: var(--text-secondary);
+      padding-top: 6px;
+      border-top: 1px dashed var(--border);
+    }
+
+    .wf-caption {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+    }
+
+    /* ==================== Section 3: 5 格非对称 Bento 亮点网格 ==================== */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+    }
+
+    .bento-cell {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease;
+    }
+
+    .bento-cell:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-card);
+    }
+
+    .bento-tint {
+      background: var(--surface-tint);
+      border-color: rgba(0, 104, 214, 0.18);
+    }
+
+    .bento-muted {
+      background: var(--surface-muted);
+    }
+
+    .col-7 { grid-column: span 7; }
+    .col-5 { grid-column: span 5; }
+    .col-4 { grid-column: span 4; }
+
+    .bento-metric {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: var(--accent);
+      line-height: 1.1;
+    }
+
+    .bento-cell h3 {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 8px;
+    }
+
+    .bento-cell p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .inline-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .inline-link:hover {
+      text-decoration: underline;
+    }
+
+    /* ==================== Section 4: 双栏安装与引擎分层（告别长表格） ==================== */
+    .setup-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .panel-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 28px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .panel-card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .panel-sub {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 22px;
+    }
+
+    .install-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .install-item {
+      padding-left: 16px;
+      border-left: 2px solid var(--accent);
+    }
+
+    .install-item h4 {
+      font-size: 15.5px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .install-item p {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+    }
+
+    .copy-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .copy-pill {
+      border: 1px solid var(--border);
+      background: var(--surface-elevated);
+      color: var(--accent);
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .copy-pill:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    .tier-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .tier-box {
+      padding: 18px;
+      border-radius: 14px;
+      background: var(--bg-page);
+      border: 1px solid var(--border);
+    }
+
+    .tier-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .tier-head h4 {
+      font-size: 15.5px;
+      font-weight: 700;
+    }
+
+    .tier-badge {
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 2px 9px;
+      border-radius: var(--radius-pill);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .tier-box p {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+
+    /* ==================== Section 5: 新手问答与可折叠更新记录 ==================== */
+    .qa-release-grid {
+      display: grid;
+      grid-template-columns: 7fr 5fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .faq-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+    }
+
+    .faq-box details {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .faq-box details:last-child {
+      border-bottom: none;
+    }
+
+    .faq-box summary {
+      padding: 18px 22px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      list-style: none;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
     }
 
-    .demo-dots {
-      display: flex;
-      gap: 7px;
+    .faq-box summary::after {
+      content: "+";
+      font-size: 18px;
+      color: var(--text-tertiary);
+      transition: transform 0.2s ease;
     }
 
-    .demo-dots span {
-      width: 11px;
-      height: 11px;
-      border-radius: 50%;
+    .faq-box details[open] summary::after {
+      transform: rotate(45deg);
     }
 
-    .dot-r { background: #FF5F57; }
-    .dot-y { background: #FEBC2E; }
-    .dot-g { background: #28C840; }
-
-    .demo-url {
-      font-size: 12px;
-      color: var(--text-tert);
-      background: var(--surface);
-      padding: 4px 14px;
-      border-radius: 7px;
-      border: 0.5px solid var(--sep);
-    }
-
-    .demo-switch {
-      display: inline-flex;
-      background: rgba(118, 118, 128, 0.14);
-      padding: 2px;
-      border-radius: 8px;
-      gap: 2px;
-    }
-
-    .demo-mode-btn {
-      border: none;
-      background: transparent;
-      color: var(--text-sec);
-      font-size: 11.5px;
-      font-weight: 500;
-      padding: 4px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.16s ease;
-    }
-
-    .demo-mode-btn.active {
-      background: var(--surface);
-      color: var(--text);
-      font-weight: 600;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-    }
-
-    .demo-body {
-      padding: 28px 32px 30px;
-    }
-
-    .demo-kicker {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-tert);
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      margin-bottom: 8px;
-    }
-
-    .demo-title {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.4px;
-      margin-bottom: 12px;
-    }
-
-    .demo-text {
-      font-size: 15px;
-      color: var(--text-sec);
+    .faq-ans {
+      padding: 0 22px 18px;
+      font-size: 14px;
+      color: var(--text-secondary);
       line-height: 1.65;
     }
 
-    .demo-trans {
-      display: block;
-      margin-top: 5px;
-      color: var(--text);
-      opacity: 0.74;
-      font-weight: 400;
+    .release-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 24px;
     }
 
-    /* 区块头部 */
-    .sec-head {
-      margin-bottom: 40px;
+    .rel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
     }
 
-    .sec-head h2 {
-      font-size: clamp(28px, 4vw, 40px);
-      font-weight: 700;
-      letter-spacing: -0.9px;
-      line-height: 1.12;
-      margin-bottom: 10px;
-    }
-
-    .sec-head p {
+    .rel-header h3 {
       font-size: 17px;
-      color: var(--text-sec);
-    }
-
-    /* Apple Bento Grid */
-    .bento {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 18px;
-    }
-
-    .bento-card {
-      background: var(--surface);
-      border-radius: var(--radius-xl);
-      padding: 32px;
-      border: 0.5px solid var(--sep);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: 210px;
-    }
-
-    .span-7 { grid-column: span 7; }
-    .span-5 { grid-column: span 5; }
-    .span-4 { grid-column: span 4; }
-    .span-6 { grid-column: span 6; }
-
-    @media (max-width: 760px) {
-      .span-7, .span-5, .span-4, .span-6 { grid-column: span 12; }
-      .nav-links { gap: 14px; }
-    }
-
-    .bento-tag {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--blue);
-      margin-bottom: 10px;
-    }
-
-    .bento-card h3 {
-      font-size: 22px;
       font-weight: 700;
-      letter-spacing: -0.4px;
-      margin-bottom: 10px;
-      line-height: 1.25;
     }
 
-    .bento-card p {
-      font-size: 14.5px;
-      color: var(--text-sec);
-      line-height: 1.6;
-    }
-
-    .bento-dark {
-      background: #161617;
-      color: #F5F5F7;
-      border-color: rgba(255, 255, 255, 0.08);
-    }
-
-    .bento-dark p {
-      color: #A1A1A6;
-    }
-
-    /* 3 步安装卡片 */
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 18px;
-    }
-
-    .step-card {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      padding: 26px;
-      border: 0.5px solid var(--sep);
-    }
-
-    .step-idx {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--blue);
-      margin-bottom: 8px;
-    }
-
-    .step-card h3 {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .step-card p {
-      font-size: 14px;
-      color: var(--text-sec);
-    }
-
-    .copy-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 14px;
-    }
-
-    .copy-pill {
-      display: inline-flex;
-      align-items: center;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: var(--blue-soft);
-      color: var(--blue);
-      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-      font-size: 12px;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      transition: opacity 0.15s ease;
-    }
-
-    .copy-pill:hover {
-      opacity: 0.82;
-    }
-
-    /* 列表卡片（引擎、快捷键、FAQ） */
-    .spec-list {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      border: 0.5px solid var(--sep);
-      overflow: hidden;
-    }
-
-    .spec-row {
-      padding: 18px 22px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-      border-bottom: 0.5px solid var(--sep);
-    }
-
-    .spec-row:last-child {
-      border-bottom: none;
-    }
-
-    .spec-title {
-      font-size: 15px;
-      font-weight: 600;
-    }
-
-    .spec-desc {
-      font-size: 13px;
-      color: var(--text-sec);
-      margin-top: 2px;
-    }
-
-    .kbd {
-      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-      font-size: 12.5px;
-      font-weight: 600;
-      background: var(--surface-alt);
-      color: var(--text);
-      padding: 5px 11px;
-      border-radius: 8px;
-      border: 0.5px solid var(--sep);
-    }
-
-    /* 更新日志时间线（Apple Release Notes 风格） */
-    .changelog {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .release-card {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      padding: 26px 28px;
-      border: 0.5px solid var(--sep);
-    }
-
-    .release-head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 14px;
-      padding-bottom: 12px;
-      border-bottom: 0.5px solid var(--sep);
-    }
-
-    .release-ver {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-    }
-
-    .badge-latest {
-      font-size: 11px;
-      font-weight: 600;
-      color: #FFFFFF;
-      background: var(--green);
-      padding: 2px 9px;
-      border-radius: 999px;
-    }
-
-    .release-date {
-      font-size: 13px;
-      color: var(--text-tert);
-    }
-
-    .release-list {
+    .rel-list {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 9px;
+      gap: 8px;
+      font-size: 13.5px;
+      color: var(--text-secondary);
     }
 
-    .release-list li {
-      font-size: 14px;
-      color: var(--text-sec);
-      padding-left: 16px;
+    .rel-list li {
+      padding-left: 14px;
       position: relative;
-      line-height: 1.55;
     }
 
-    .release-list li::before {
+    .rel-list li::before {
       content: "";
       position: absolute;
       left: 0;
@@ -776,91 +1003,108 @@
       width: 5px;
       height: 5px;
       border-radius: 50%;
-      background: var(--blue);
+      background: var(--accent);
     }
 
-    .release-list strong {
-      color: var(--text);
+    .rel-history {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .rel-history summary {
+      font-size: 13px;
       font-weight: 600;
-    }
-
-    /* FAQ */
-    details {
-      border-bottom: 0.5px solid var(--sep);
-    }
-
-    details:last-child {
-      border-bottom: none;
-    }
-
-    summary {
-      padding: 18px 22px;
-      font-size: 15px;
-      font-weight: 600;
+      color: var(--accent);
       cursor: pointer;
       list-style: none;
+    }
+
+    .rel-old-block {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--text-secondary);
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    summary::after {
-      content: "+";
-      font-size: 20px;
-      font-weight: 400;
-      color: var(--text-tert);
-      transition: transform 0.2s ease;
-    }
-
-    details[open] summary::after {
-      transform: rotate(45deg);
-    }
-
-    .faq-body {
-      padding: 0 22px 18px;
-      font-size: 14px;
-      color: var(--text-sec);
-      line-height: 1.65;
+      flex-direction: column;
+      gap: 8px;
     }
 
     code {
       font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
       font-size: 0.9em;
-      background: var(--surface-alt);
+      background: var(--surface-muted);
       padding: 2px 6px;
-      border-radius: 5px;
+      border-radius: 6px;
     }
 
     footer {
       padding: 36px 24px 48px;
+      border-top: 1px solid var(--border);
       text-align: center;
-      font-size: 12.5px;
-      color: var(--text-tert);
-      border-top: 0.5px solid var(--sep);
+      font-size: 13px;
+      color: var(--text-tertiary);
     }
 
-    /* 顶部轻提示 */
+    /* 滚动入场动效（IntersectionObserver 驱动，仅动画 transform 与 opacity） */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     #guideToast {
       position: fixed;
-      top: 20px;
+      top: 18px;
       left: 50%;
-      transform: translate(-50%, -12px);
-      background: rgba(29, 29, 31, 0.9);
-      backdrop-filter: blur(16px);
+      transform: translate(-50%, -10px);
+      background: rgba(22, 24, 29, 0.92);
       color: #FFFFFF;
-      padding: 9px 18px;
-      border-radius: 999px;
+      padding: 8px 18px;
+      border-radius: var(--radius-pill);
       font-size: 13px;
       font-weight: 500;
       opacity: 0;
       pointer-events: none;
-      transition: all 0.22s ease;
-      z-index: 999;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 90;
     }
 
     #guideToast.show {
       opacity: 1;
       transform: translate(-50%, 0);
+    }
+
+    /* 响应式折叠规则 (< 900px 单栏化) */
+    @media (max-width: 900px) {
+      .hero {
+        min-height: auto;
+        padding: 36px 0 52px;
+      }
+      .hero-grid,
+      .workflow-layout,
+      .setup-split,
+      .qa-release-grid {
+        grid-template-columns: 1fr;
+      }
+      .col-7, .col-5, .col-4 {
+        grid-column: span 12;
+      }
+      .nav-links a:not(.btn-nav) {
+        display: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
     }
   </style>
 </head>
@@ -872,307 +1116,321 @@
         <span>DualPage</span>
       </a>
       <div class="nav-links">
-        <a href="#features">亮点</a>
-        <a href="#install">安装</a>
-        <a href="#api">引擎与 API</a>
-        <a href="#changelog">更新日志</a>
-        <button type="button" id="themeToggleBtn" class="theme-btn" title="切换浅色 / 深色模式">☾</button>
-        <a href="options.html" class="nav-cta">打开 API 配置</a>
+        <a href="#quickstart">新手三招</a>
+        <a href="#features">核心优势</a>
+        <a href="#install">安装与引擎</a>
+        <a href="#faq">常见问题</a>
+        <button type="button" id="themeToggleBtn" class="theme-btn" title="切换浅色或深色模式">☾</button>
+        <a href="options.html" class="btn-primary btn-nav">配置 API 与词库</a>
       </div>
     </div>
-    <div class="scroll-progress" id="scrollProgress"></div>
   </nav>
 
-  <!-- Hero -->
+  <!-- Section 1: 左右分栏 Hero + 真人可点交互体验窗 -->
   <section class="hero">
-    <div class="inner">
-      <img class="hero-icon hero-anim delay-1" src="icons/logo256.png" alt="DualPage Logo" />
-      <div class="hero-eyebrow hero-anim delay-2">DualPage 2.2 · 浏览器实时翻译扩展</div>
-      <h1 class="hero-anim delay-2">双面阅读，如原生般自然。</h1>
-      <p class="hero-sub hero-anim delay-3">轻量、极速、无打扰的实时网页翻译器。可视区优先秒翻、整段无感双语对照、划词朗读，支持免 Key 开源 AI 与任意自定义 API。</p>
-      <div class="hero-actions hero-anim delay-4">
-        <a class="btn-apple" href="#install">30 秒安装指南</a>
-        <a class="link-apple" href="#changelog">查看 v2.2 更新日志 ›</a>
-      </div>
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">零配置开箱即用</span>
+          <h1>打开外语网页，<br />像读母语一样自然。</h1>
+          <p class="hero-sub">装好就能直接用，无需注册账号，也不用先填密钥。支持整段无感双语对照、划词原位精翻与可拖动悬浮球。</p>
+          <div class="hero-ctas">
+            <a class="btn-primary" href="#quickstart">30 秒看懂怎么用</a>
+            <a class="btn-secondary" href="#install">本地安装步骤</a>
+          </div>
+        </div>
 
-      <!-- 交互式实时效果预览 -->
-      <div class="demo-frame hero-anim delay-5">
-        <div class="demo-bar">
-          <div class="demo-dots">
-            <span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span>
-          </div>
-          <div class="demo-url">example.com/article</div>
-          <div class="demo-switch" id="demoSwitch">
-            <button type="button" class="demo-mode-btn active" data-demo="bilingual">双语对照</button>
-            <button type="button" class="demo-mode-btn" data-demo="replace">仅译文</button>
-            <button type="button" class="demo-mode-btn" data-demo="original">原文</button>
-          </div>
-        </div>
-        <div class="demo-body" id="demoBody">
-          <div class="demo-kicker">实时网页阅读预览</div>
-          <div class="demo-title" id="demoTitle">
-            Read the web in any language, effortlessly.
-            <span class="demo-trans">轻松无障碍地阅读任意语言的网页内容。</span>
-          </div>
-          <div class="demo-text" id="demoText">
-            DualPage translates entire paragraphs naturally without breaking layouts or interrupting your flow. Switch between bilingual reading, clean translation, or original text in a single click.
-            <span class="demo-trans">DualPage 以自然的方式整段翻译网页内容，不破坏页面排版，也不打断阅读心流。只需轻点一下，即可在双语对照、纯译文与原文之间自由切换。</span>
-          </div>
-          <div class="demo-pill-wrap" id="demoPill" title="点击体验悬浮球一键切换">
-            <span class="demo-pill-main">
-              <span class="demo-pill-logo">
-                <svg viewBox="0 0 100 100" width="13" height="13" aria-hidden="true">
-                  <g transform="translate(50 50) skewY(-22) translate(-50 -50)">
-                    <rect x="34" y="42" width="46" height="36" rx="10" fill="none" stroke="#18181A" stroke-width="8"/>
-                    <rect x="16" y="20" width="48" height="38" rx="10" fill="#18181A"/>
-                  </g>
-                </svg>
-              </span>
-              <span id="demoPillText">原文</span>
-            </span>
-            <span class="demo-pill-more">⋯</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 核心功能 Bento -->
-  <section class="band band-gray" id="features">
-    <div class="inner">
-      <div class="sec-head">
-        <h2>每一处细节，都为效率而生。</h2>
-        <p>把干扰降到零，让外语后台和长文阅读同样顺滑。</p>
-      </div>
-      <div class="bento">
-        <div class="bento-card span-7">
-          <div>
-            <div class="bento-tag">整段双语引擎</div>
-            <h3>拒绝碎句插播，保持网页原本的美感。</h3>
-            <p>按完整段落语义一次性翻译，译文柔和排布在原文下方；没有多余色块与竖线，按钮与导航栏自动切换极简行内跟显，不撑破任何复杂后台排版。</p>
-          </div>
-        </div>
-        <div class="bento-card bento-dark span-5">
-          <div>
-            <div class="bento-tag">3 路并发 + 跨页缓存</div>
-            <h3>切页 0ms 秒出中文。</h3>
-            <p>可视区优先翻译 + 提前预翻下一屏，配合 4000 条跨标签页共享缓存，常逛的网站导航、文档与后台界面瞬间完成渲染。</p>
-          </div>
-        </div>
-        <div class="bento-card span-4">
-          <div>
-            <div class="bento-tag">划词沉浸式对照</div>
-            <h3>选中即现，弹窗或原位对照任选。</h3>
-            <p>选中任意外语弹出双按钮毛玻璃条：点「划词翻译」弹窗查看并支持复制/朗读，点「沉浸对照」直接在该段下方插入译文，再点即可收起。</p>
-          </div>
-        </div>
-        <div class="bento-card span-4">
-          <div>
-            <div class="bento-tag">可拖动毛玻璃悬浮球</div>
-            <h3>贴边吸附，一球控全局。</h3>
-            <p>单击左侧「Logo + 翻译/原文」一键翻译或还原；按住可自由拖动并自动吸边记忆位置；点右侧 <code>⋯</code> 呼出快捷菜单（切双语、自动翻译本站、隐藏悬浮球）；颜色随状态自动变化（毛玻璃待机 / 绿翻译中 / 蓝已开启）。</p>
-          </div>
-        </div>
-        <div class="bento-card span-4">
-          <div>
-            <div class="bento-tag">专属词库 · 支持 Excel 模板</div>
-            <h3>专业术语，按你的习惯翻译。</h3>
-            <p>支持可视化逐条增删，以及一键下载 CSV/Excel 模板、批量导入与导出，免费引擎与 AI 引擎同步优先应用。<br /><a class="link-apple" href="options.html#glossary" style="font-size:13.5px;display:inline-block;margin-top:8px;">前往管理术语表 ›</a></p>
-          </div>
-        </div>
-        <div class="bento-card span-6">
-          <div>
-            <div class="bento-tag">真正零服务器隐私</div>
-            <h3>无账号、无中转、无追踪。</h3>
-            <p>没有后端服务器，不收集浏览历史或 Cookie。你的 API Key、专属术语表与自动翻译白名单全部仅保存在本机浏览器中，翻译请求直接发往你选择的引擎。</p>
-          </div>
-        </div>
-        <div class="bento-card bento-dark span-6">
-          <div>
-            <div class="bento-tag">全功能零会员锁 · 仅 62 KB</div>
-            <h3>克制轻量，却不设任何付费墙。</h3>
-            <p>免 Key 引擎、自定义任意 OpenAI 兼容中转站 / 本地 Ollama、可视化 CSV 术语表、JSON 一键导出分享团队，全部永久免费开放，无弹窗打扰。</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 安装步骤 -->
-  <section class="band" id="install">
-    <div class="inner">
-      <div class="sec-head">
-        <h2>三步完成安装。</h2>
-        <p>免费离线加载，支持 Chrome、Edge 及所有 Chromium 浏览器。</p>
-      </div>
-      <div class="steps">
-        <div class="step-card">
-          <div class="step-idx">STEP 01</div>
-          <h3>打开扩展管理页</h3>
-          <p>在地址栏打开扩展管理页，开启右上角「开发者模式」开关（浏览器自带功能，完全免费）。</p>
-          <div class="copy-row">
-            <button class="copy-pill" data-copy="chrome://extensions/">复制 chrome://extensions/</button>
-            <button class="copy-pill" data-copy="edge://extensions/">复制 edge://extensions/</button>
-          </div>
-        </div>
-        <div class="step-card">
-          <div class="step-idx">STEP 02</div>
-          <h3>加载扩展目录</h3>
-          <p>点击左上角「加载已解压的扩展程序」，选中 <code>web-translator-ext</code> 文件夹即刻生效。</p>
-        </div>
-        <div class="step-card">
-          <div class="step-idx">STEP 03</div>
-          <h3>免刷新直接翻译</h3>
-          <p>点击右上角 DualPage 图标、页面悬浮球或按 <code>Alt + T</code>，即可在任意外语网页开启实时翻译。</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 翻译引擎与自定义 API -->
-  <section class="band band-gray" id="api">
-    <div class="inner">
-      <div class="sec-head">
-        <h2>多引擎自由切换，开放任意 API 接入。</h2>
-        <p>默认免 Key 开箱即用；也可接入免费国内大模型或你自己的中转接口。</p>
-      </div>
-      <div class="spec-list">
-        <div class="spec-row">
-          <div>
-            <div class="spec-title">Pollinations AI（GitHub 开源免费 AI）</div>
-            <div class="spec-desc">无需注册、无需 API Key，遇到公共节点限流自动无缝切微软 Edge 兜底</div>
-          </div>
-          <span class="kbd">免 Key 直用</span>
-        </div>
-        <div class="spec-row">
-          <div>
-            <div class="spec-title">微软 Edge / Google 免费翻译</div>
-            <div class="spec-desc">国内直连极速响应，支持单批 55 条文本并发处理，互为超时兜底</div>
-          </div>
-          <span class="kbd">免 Key 高速</span>
-        </div>
-        <div class="spec-row">
-          <div>
-            <div class="spec-title">智谱 GLM-4-Flash / 硅基流动 Qwen</div>
-            <div class="spec-desc">国内直连免费 AI 模型，已内置接口地址与模型名，填入免费 Key 即刻起飞</div>
-          </div>
-          <button class="copy-pill" data-copy="https://open.bigmodel.cn/api/paas/v4">复制智谱 URL</button>
-        </div>
-        <div class="spec-row">
-          <div>
-            <div class="spec-title">自定义 API（兼容任意 OpenAI 格式 / 中转站）</div>
-            <div class="spec-desc">支持 DeepSeek、OpenAI、OneAPI、NewAPI、OpenRouter、阿里云百炼、本地 Ollama；自动智能补全 <code>/v1/chat/completions</code></div>
-          </div>
-          <button class="copy-pill" data-copy="https://api.deepseek.com/v1">复制 DeepSeek URL</button>
-        </div>
-        <div class="spec-row">
-          <div>
-            <div class="spec-title">快捷键速查</div>
-            <div class="spec-desc"><code>Alt + T</code> 开关实时翻译 · <code>Esc</code> 关闭划词卡片/菜单 · 按住悬浮球自由拖动</div>
-          </div>
-          <span class="kbd">Alt + T</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 更新日志 -->
-  <section class="band" id="changelog">
-    <div class="inner">
-      <div class="sec-head">
-        <h2>更新日志。</h2>
-        <p>持续打磨翻译质量、速度与交互细节。</p>
-      </div>
-      <div class="changelog">
-        <article class="release-card">
-          <div class="release-head">
-            <div class="release-ver">
-              <span>v2.2</span>
-              <span class="badge-latest">当前版本</span>
+        <!-- 右侧现场互动沙盒 -->
+        <div class="sandbox" aria-label="DualPage 实时交互演示">
+          <div class="sandbox-top">
+            <div class="win-dots"><span></span><span></span><span></span></div>
+            <span class="sandbox-hint">直接点下方按钮或段落试试</span>
+            <div class="seg-group" id="demoSwitch">
+              <button type="button" class="seg-item active" data-demo="bilingual">双语对照</button>
+              <button type="button" class="seg-item" data-demo="replace">仅译文</button>
+              <button type="button" class="seg-item" data-demo="original">原文</button>
             </div>
-            <span class="release-date">2026-11-26</span>
           </div>
-          <ul class="release-list">
-            <li><strong>划词沉浸式对照</strong>：选中外语弹出暗黑毛玻璃双按钮条（<code>划词翻译 | 沉浸对照</code>），支持不翻整页直接对选中段落原位双语对照。</li>
-            <li><strong>首屏极速 + 跨天缓存</strong>：首屏第 1 批精简为 12 条可见核心文本优先出字，后续升级 5 路并发，并启用 5000 条跨天本地持久化缓存（0% GPU 占用）。</li>
-            <li><strong>独立 API 配置页与 CSV 术语表模板</strong>：新增全屏 Apple 风格配置页，支持多平台 Key 独立保存、一键测试连接（显示真实延迟）、可视化术语表增删以及 <strong>Excel/WPS 兼容的 CSV 模板下载、导入与导出</strong>。</li>
-            <li><strong>API 接口可靠性升级</strong>：修复测试连接命中本地缓存的问题，增强 AI 返回格式解析容错，隔离各平台密钥并细化 401/403/404/429/超时中文报错提示；弹窗与配置页多平台 Key 自动同步。</li>
-            <li><strong>白天 / 暗黑模式与页面动效</strong>：导航栏新增 <code>☀ / ☾</code> 一键切换开关并跨页记忆；加入首屏错峰入场、滚动逐级显现、进度条与交互式演示悬浮球；点击任意页面左上角 Logo 均可返回主页。</li>
-            <li><strong>强样式隔离与图标精修</strong>：悬浮球与划词条全面加入 <code>all: unset</code> 防污染隔离，内联无黑边纯矢量 SVG Logo，任何网站下均保持精致比例。</li>
-          </ul>
-        </article>
 
-        <article class="release-card">
-          <div class="release-head">
-            <div class="release-ver">
-              <span>v2.1</span>
+          <div class="sandbox-stage" id="demoBody">
+            <div class="article-tag">实时网页预览 (点击下方英文段落可体验「划词双按钮」)</div>
+            <div class="demo-heading" id="demoTitle">
+              Great tools stay out of your way until you need them.
+              <span class="demo-trans">真正好用的工具平时毫不打扰，只在你需要时恰到好处地出现。</span>
             </div>
-            <span class="release-date">2026-11-26</span>
-          </div>
-          <ul class="release-list">
-            <li><strong>品牌与视觉焕新</strong>：正式定名为 <strong>DualPage</strong>，全面启用极简双层卡片 Logo，悬浮胶囊同步融入品牌图标。</li>
-            <li><strong>整段双语对照重构</strong>：双语模式改为按完整语义段落翻译，译文无感融入原文下方，彻底解决行内加粗/链接被切碎的问题。</li>
-            <li><strong>新增免费 AI 引擎与自定义 API 容错</strong>：内置 Pollinations 免 Key 开源 AI、智谱 GLM-4-Flash、硅基流动 Qwen 预设；自定义 API 支持智能路径补全（自动兼容带或不带 <code>/v1</code> 的地址）。</li>
-            <li><strong>性能 3 倍提速</strong>：升级 3 路并发调度、55 条大批量合并、4000 条跨标签页缓存、Token 预热与 5 秒超时自动切源。</li>
-            <li><strong>稳定性修复</strong>：彻底解决扩展重载后残留多个悬浮球、iframe 重复生成以及 <code>Extension context invalidated</code> 报错问题；修复说明页 MV3 CSP 外链脚本规范。</li>
-          </ul>
-        </article>
 
-        <article class="release-card">
-          <div class="release-head">
-            <div class="release-ver"><span>v2.0</span></div>
-            <span class="release-date">2026-11-26</span>
-          </div>
-          <ul class="release-list">
-            <li><strong>iOS 风格界面重塑</strong>：弹窗升级为 iOS 设置页分组卡片、绿色滑动开关与分段控制器，全界面自动适配系统深浅色模式。</li>
-            <li><strong>划词即译与语音朗读</strong>：选中任意外语弹出毛玻璃气泡，展开译文卡片支持一键复制与系统朗读。</li>
-            <li><strong>悬浮球交互升级</strong>：支持全屏自由拖动、左右贴边吸附与跨页记忆位置，新增 <code>⋯</code> 快捷控制菜单。</li>
-            <li><strong>免刷新热注入与自定义术语表</strong>：新增 <code>scripting</code> 自动热注入，已打开的网页无需刷新即可开翻；支持自定义 <code>原文=译文</code> 词库与 AI 一键测试连接。</li>
-          </ul>
-        </article>
+            <div class="demo-para" id="demoPara" title="点击此段体验划词翻译与沉浸对照">
+              <span id="demoParaOrig">Select any sentence on a foreign page to reveal a compact action bar. You can check a quick popup card with pronunciation, or insert a clean bilingual translation right underneath that single paragraph.</span>
+              <span class="demo-trans" id="demoParaTrans">在外语网页上选中任意一句话，就会弹出轻巧的双按钮操作条。你可以弹窗查看译文并朗读，也可以只把这一段原位展开双语对照。</span>
+            </div>
 
-        <article class="release-card">
-          <div class="release-head">
-            <div class="release-ver"><span>v1.0</span></div>
-            <span class="release-date">2026-11-26</span>
+            <!-- 模拟划词双按钮条 -->
+            <div class="sandbox-sel-bar hidden" id="sandboxSelBar">
+              <button type="button" class="sb-chip-btn" id="sbPopupBtn">划词翻译</button>
+              <button type="button" class="sb-chip-btn" id="sbImmersiveBtn">沉浸对照</button>
+            </div>
+
+            <!-- 模拟划词弹窗卡片 -->
+            <div class="sandbox-popup-card hidden" id="sandboxPopupCard">
+              <strong>划词译文：</strong>在外语网页上选中任意一句话，就会弹出轻巧的双按钮操作条，支持一键复制与语音朗读。
+            </div>
+
+            <div class="try-tip">提示：也可以点右下角蓝色悬浮球或右侧三点菜单体验</div>
+
+            <!-- 悬浮球右侧菜单演示 -->
+            <div class="demo-quick-menu hidden" id="demoQuickMenu">
+              <button type="button" class="dqm-btn" id="dqmToggleMode">
+                <span>切换模式</span>
+                <span class="dqm-val" id="dqmModeVal">双语对照</span>
+              </button>
+              <button type="button" class="dqm-btn" id="dqmToggleAuto">
+                <span>自动翻译本站</span>
+                <span class="dqm-val" id="dqmAutoVal">已开启</span>
+              </button>
+            </div>
+
+            <!-- 沙盒悬浮球 -->
+            <div class="demo-pill-wrap" id="demoPill">
+              <button type="button" class="demo-pill-main" id="demoPillMain" title="点击开关全页翻译">
+                <span class="demo-pill-logo">
+                  <svg viewBox="0 0 100 100" width="13" height="13" aria-hidden="true">
+                    <g transform="translate(50 50) skewY(-22) translate(-50 -50)">
+                      <rect x="34" y="42" width="46" height="36" rx="10" fill="none" stroke="#18181A" stroke-width="8"/>
+                      <rect x="16" y="20" width="48" height="38" rx="10" fill="#18181A"/>
+                    </g>
+                  </svg>
+                </span>
+                <span id="demoPillText">原文</span>
+              </button>
+              <button type="button" class="demo-pill-more" id="demoPillMore" title="展开快捷菜单">⋯</button>
+            </div>
           </div>
-          <ul class="release-list">
-            <li><strong>首个可用版本发布</strong>：支持任意网页动态实时翻译（适配 SPA 弹窗与异步表格），内置微软 Edge / Google / DeepSeek / OpenAI / Gemini 双引擎与 Yandex Market 俄语电商术语表。</li>
-          </ul>
-        </article>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- FAQ -->
-  <section class="band band-gray" id="faq">
-    <div class="inner">
-      <div class="sec-head">
-        <h2>常见问题。</h2>
+  <!-- Section 2: 第一次用，只需记住这三招 -->
+  <section class="band band-alt" id="quickstart">
+    <div class="container">
+      <div class="sec-header">
+        <h2>第一次上手，只需记住这三招。</h2>
+        <p>覆盖「通读整页」「精读单句」「常逛网站全自动」三种最高频的外语浏览场景。</p>
       </div>
-      <div class="spec-list">
-        <details>
-          <summary>为什么浏览器内置页面（如 chrome://）无法翻译？</summary>
-          <div class="faq-body">出于安全限制，Chrome 与 Edge 不允许任何扩展向 <code>chrome://</code>、<code>edge://</code> 或应用商店页面注入脚本。所有常规 <code>http://</code> 与 <code>https://</code> 网页均可正常实时翻译。</div>
-        </details>
-        <details>
-          <summary>如何让常用外语网站每次打开都自动翻译？</summary>
-          <div class="faq-body">打开目标网站后，点击右上角 DualPage 图标（或悬浮球右侧的 <code>⋯</code>），打开「始终自动翻译当前网站」开关即可，也可以在 API 配置页统一管理白名单。</div>
-        </details>
-        <details>
-          <summary>想发给团队同事一起用，怎么分享最方便？</summary>
-          <div class="faq-body">直接把整个 <code>web-translator-ext</code> 文件夹压缩发给同事，解压后按上方三步加载即可永久免费使用，无需注册任何付费开发者账号。</div>
-        </details>
+
+      <div class="workflow-layout">
+        <div class="wf-tabs" id="wfTabs">
+          <button type="button" class="wf-tab active" data-wf="page">
+            <div class="wf-tab-head">
+              <h3>通读长文与复杂后台</h3>
+              <span class="wf-key">Alt + T 或点悬浮球</span>
+            </div>
+            <p>一键把整张网页切换为双语对照或纯中文界面，滚动加载的新内容也会自动跟翻，再按一次立即无损恢复原文。</p>
+          </button>
+
+          <button type="button" class="wf-tab" data-wf="select">
+            <div class="wf-tab-head">
+              <h3>只想看懂某一句或某一段</h3>
+              <span class="wf-key">鼠标划选外语文字</span>
+            </div>
+            <p>不翻整页也能局部阅读：选中句子自动浮出「划词翻译 | 沉浸对照」，看弹窗朗读或只把该段原位展开对照任你选。</p>
+          </button>
+
+          <button type="button" class="wf-tab" data-wf="auto">
+            <div class="wf-tab-head">
+              <h3>每天必逛的外语工作台</h3>
+              <span class="wf-key">悬浮球点 ⋯ 开启自动</span>
+            </div>
+            <p>在常用外语站点点一下悬浮球右侧的 ⋯，开启「自动翻译本站」，以后每次打开都会直接呈现中文，省去手动点击。</p>
+          </button>
+        </div>
+
+        <div class="wf-stage" id="wfStage">
+          <div>
+            <div class="article-tag" id="wfStageTag">场景演示：整页无感双语对照</div>
+            <div class="wf-visual" id="wfVisual">
+              <div class="wf-mock-orig" id="wfOrig">Orders shipped from local fulfillment centers receive priority placement in search results.</div>
+              <div class="wf-mock-trans" id="wfTrans">从本地履约中心发货的订单将在搜索结果中获得优先展示权重。</div>
+            </div>
+          </div>
+          <div class="wf-caption">
+            <span id="wfTip">没有刺眼的蓝色竖线与底色框，译文自然融入原网页字号与配色，按钮和导航栏也不会变形。</span>
+            <a class="inline-link" href="options.html">自定义偏好设置 ›</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: 核心优势 5 格 Bento -->
+  <section class="band" id="features">
+    <div class="container">
+      <div class="sec-header">
+        <span class="eyebrow">为什么选择 DualPage</span>
+        <h2>克制轻量，把自由和隐私还给你。</h2>
+        <p>不塞臃肿功能，不设付费会员锁，专注把网页阅读这件事做到极致顺手。</p>
+      </div>
+
+      <div class="bento-grid">
+        <div class="bento-cell bento-tint col-7">
+          <div>
+            <h3>默认免 Key 直用，也开放任意 AI 接口</h3>
+            <p>装完即可使用内置高速免费翻译引擎；如果你追求更地道的长句质量，可在独立配置页填入智谱 GLM-4、硅基流动、DeepSeek、Gemini 或任意 OpenAI 兼容中转站与本地 Ollama，各平台密钥独立保存互不覆盖。</p>
+          </div>
+          <a class="inline-link" href="options.html">打开 API 与引擎配置中心 ›</a>
+        </div>
+
+        <div class="bento-cell bento-muted col-5">
+          <div class="bento-metric">0 ms 二次秒开</div>
+          <div>
+            <h3>首屏优先 + 5,000 条本地记忆</h3>
+            <p>首屏最先看到的 12 段文字优先极速出字，后续开启 5 路并发铺满整页；常逛网站的菜单与高频词自动缓存于本机硬盘（不到 1 MB，0% 显卡占用），切页瞬间呈现。</p>
+          </div>
+        </div>
+
+        <div class="bento-cell col-4">
+          <div>
+            <h3>真正零服务器隐私</h3>
+            <p>无账号体系、无开发者后端服务器、无统计追踪代码。你的 API 密钥与词库只保存在本机浏览器存储中，翻译请求直接从浏览器发往目标引擎。</p>
+          </div>
+        </div>
+
+        <div class="bento-cell col-4">
+          <div>
+            <h3>支持 Excel 模板的专属词库</h3>
+            <p>遇到行业黑话或固定缩写？支持可视化逐条添加，也能一键下载 UTF-8 CSV 模板用 Excel 或 WPS 批量编辑导入，免费与 AI 引擎均优先套用。</p>
+          </div>
+          <a class="inline-link" href="options.html#glossary">前往管理术语表 ›</a>
+        </div>
+
+        <div class="bento-cell col-4">
+          <div>
+            <h3>64 KB 纯净体积，零付费墙</h3>
+            <p>整个扩展安装包仅约一张小图标大小，所有高级功能（自定义接口、术语表、JSON 团队配置分享、深浅色切换）全部永久免费开放。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: 本地安装与引擎选择分层 -->
+  <section class="band band-alt" id="install">
+    <div class="container">
+      <div class="sec-header">
+        <h2>本地安装与引擎选择。</h2>
+        <p>支持 Edge、Chrome 及所有 Chromium 内核浏览器。</p>
+      </div>
+
+      <div class="setup-split" id="api">
+        <div class="panel-card">
+          <h3>离线加载指南</h3>
+          <p class="panel-sub">若未从应用商店安装，可通过解压文件夹方式免费永久加载。</p>
+          <div class="install-list">
+            <div class="install-item">
+              <h4>开启扩展开发者模式</h4>
+              <p>复制下方地址粘贴到浏览器地址栏回车，打开页面右上角的「开发者模式」开关。</p>
+              <div class="copy-group">
+                <button type="button" class="copy-pill" data-copy="edge://extensions/">复制 edge://extensions/</button>
+                <button type="button" class="copy-pill" data-copy="chrome://extensions/">复制 chrome://extensions/</button>
+              </div>
+            </div>
+            <div class="install-item">
+              <h4>选择解压后的扩展文件夹</h4>
+              <p>点击左上角「加载已解压的扩展程序」，选中包含 <code>manifest.json</code> 的扩展目录即可完成安装。</p>
+            </div>
+            <div class="install-item">
+              <h4>打开任意外语网页开翻</h4>
+              <p>无需刷新已打开的网页，直接按 <code>Alt + T</code>、点击页面右下角悬浮球或浏览器右上角扩展图标即可实时翻译。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <h3>我该选哪个翻译引擎？</h3>
+          <p class="panel-sub">新手建议先用免配置方案，有更高长文精度需求再接入大模型。</p>
+          <div class="tier-stack">
+            <div class="tier-box">
+              <div class="tier-head">
+                <h4>日常省心首选：微软 Edge / Pollinations AI</h4>
+                <span class="tier-badge">零配置 · 免 Key</span>
+              </div>
+              <p>微软 Edge 引擎国内直连响应最快，适合速览网页与操作后台；Pollinations 为开源免费 AI，无需注册即可体验自然语感，忙碌时自动回退保障不中断。</p>
+            </div>
+
+            <div class="tier-box">
+              <div class="tier-head">
+                <h4>深度精读首选：智谱 GLM-4 / DeepSeek / 自有接口</h4>
+                <span class="tier-badge">高精度 · 独立存 Key</span>
+              </div>
+              <p>智谱 <code>glm-4-flash</code> 与硅基流动提供国内高速免费额度；也支持填入 DeepSeek、OpenRouter、OneAPI 中转站地址，系统会自动补全接口路径并支持一键测速。</p>
+              <div class="copy-group">
+                <button type="button" class="copy-pill" data-copy="https://open.bigmodel.cn/api/paas/v4">复制智谱接口地址</button>
+                <button type="button" class="copy-pill" data-copy="https://api.deepseek.com/v1">复制 DeepSeek 地址</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 5: 新手常见问题 + 精简更新记录 -->
+  <section class="band" id="faq">
+    <div class="container">
+      <div class="sec-header">
+        <h2>新手常见问题与更新记录。</h2>
+      </div>
+
+      <div class="qa-release-grid">
+        <div class="faq-box">
+          <details open>
+            <summary>刚装好扩展，必须要先去申请 API Key 才能用吗？</summary>
+            <div class="faq-ans">完全不需要。DualPage 默认内置了免 Key 高速翻译引擎，装好后直接打开任何外语网页点「翻译」悬浮球或按 <code>Alt + T</code> 就能立刻使用。</div>
+          </details>
+          <details>
+            <summary>为什么在浏览器设置页或扩展商店里点翻译没反应？</summary>
+            <div class="faq-ans">出于浏览器底层安全限制，所有扩展均不允许在 <code>edge://</code>、<code>chrome://</code> 或官方扩展商店页面内运行脚本。请切换到任意常规 <code>https://</code> 外语网站测试。</div>
+          </details>
+          <details>
+            <summary>悬浮球挡住了网页右下角的按钮怎么办？</summary>
+            <div class="faq-ans">鼠标左键按住悬浮球即可自由拖到屏幕任意高度，松手后靠近左右边缘会自动贴边停靠并跨网页记住位置；也可以点悬浮球右侧的 <code>⋯</code> 选择隐藏悬浮球，单靠 <code>Alt + T</code> 快捷键控制。</div>
+          </details>
+          <details>
+            <summary>怎么把配好的接口和术语表同步给团队同事？</summary>
+            <div class="faq-ans">点击右上角「配置 API 与词库」，在配置中心顶部点击「导出配置」生成 JSON 文件发给同事，同事点击「导入配置」即可一秒同步全部设置与词表。</div>
+          </details>
+        </div>
+
+        <div class="release-box" id="changelog">
+          <div class="rel-header">
+            <h3>最近更新 (v2.2)</h3>
+            <span class="wf-key">当前版本</span>
+          </div>
+          <ul class="rel-list">
+            <li>新增划词双按钮毛玻璃条，支持弹窗朗读与单段原位「沉浸对照」。</li>
+            <li>首屏 12 段优先极速出字 + 5 路并发 + 5,000 条跨天本地缓存。</li>
+            <li>上线独立配置中心，支持各平台密钥独立存储、延迟测速与 Excel CSV 术语表模板导入导出。</li>
+            <li>重写新手交互式指南主页，支持现场试玩全部核心手势与深浅色主题记忆。</li>
+          </ul>
+
+          <details class="rel-history">
+            <summary>查看历史版本记录 (v1.0 - v2.1)</summary>
+            <div class="rel-old-block">
+              <div><strong>v2.1：</strong>定名 DualPage 并启用双层卡片矢量图标；重构整段语义双语引擎，消除碎句与色块干扰；新增开源免费 AI 引擎与接口路径自动容错。</div>
+              <div><strong>v2.0：</strong>加入划词气泡、贴边可拖动悬浮球与快捷菜单，支持已打开网页免刷新热注入。</div>
+              <div><strong>v1.0：</strong>首个版本发布，支持动态网页实时翻译、双引擎自动兜底与站点自动翻译白名单。</div>
+            </div>
+          </details>
+        </div>
       </div>
     </div>
   </section>
 
   <footer>
-    DualPage v2.2 · 你的 API Key 与自定义术语表仅保存在本机浏览器中，不上传至任何第三方服务器。
+    DualPage · 纯本地零服务器架构，你的 API Key 与自定义术语表仅保存在本机浏览器中。
   </footer>
 
   <div id="guideToast">已复制到剪贴板</div>
-
   <script src="guide.js"></script>
 </body>
 </html>
