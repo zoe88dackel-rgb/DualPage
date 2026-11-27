@@ -1,16 +1,18 @@
 const toast = document.getElementById("guideToast");
+const scrollProgress = document.getElementById("scrollProgress");
 const themeToggleBtn = document.getElementById("themeToggleBtn");
 let toastTimer = null;
 
+// 深浅色模式手动切换 + 跨页记忆
 function applyTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
   if (themeToggleBtn) {
     themeToggleBtn.textContent = theme === "dark" ? "☀" : "☾";
-    themeToggleBtn.title = theme === "dark" ? "切换浅色模式" : "切换深色模式";
+    themeToggleBtn.title = theme === "dark" ? "切换为浅色模式" : "切换为深色模式";
   }
 }
 
-(function initTheme() {
+function initTheme() {
   const saved = localStorage.getItem("dualpage_theme");
   const initial =
     saved === "dark" || saved === "light"
@@ -19,7 +21,7 @@ function applyTheme(theme) {
       ? "dark"
       : "light";
   applyTheme(initial);
-})();
+}
 
 themeToggleBtn?.addEventListener("click", () => {
   const curr = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
@@ -27,6 +29,8 @@ themeToggleBtn?.addEventListener("click", () => {
   localStorage.setItem("dualpage_theme", next);
   applyTheme(next);
 });
+
+initTheme();
 
 function showCopyToast(msg) {
   if (!toast) return;
@@ -36,6 +40,7 @@ function showCopyToast(msg) {
   toastTimer = setTimeout(() => toast.classList.remove("show"), 1800);
 }
 
+// 一键复制按钮
 document.querySelectorAll("[data-copy]").forEach((btn) => {
   btn.addEventListener("click", () => {
     const val = btn.getAttribute("data-copy");
@@ -46,145 +51,134 @@ document.querySelectorAll("[data-copy]").forEach((btn) => {
   });
 });
 
+// 点击左上角 Logo 平滑回到页面顶部
 document.querySelector(".brand")?.addEventListener("click", (e) => {
   e.preventDefault();
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
-// 示例区交互逻辑
+// 顶部极细滚动进度条
+window.addEventListener(
+  "scroll",
+  () => {
+    if (!scrollProgress) return;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = max > 0 ? Math.min(100, Math.max(0, (window.scrollY / max) * 100)) : 0;
+    scrollProgress.style.width = `${pct}%`;
+  },
+  { passive: true }
+);
+
+// Apple 风格滚动逐级浮现（Scroll Reveal）
+const revealTargets = document.querySelectorAll(
+  ".sec-head, .bento-card, .step-card, .spec-list, .release-card"
+);
+
+revealTargets.forEach((el) => {
+  el.classList.add("reveal");
+  // 同容器内卡片做微妙的错峰延迟
+  const siblings = el.parentElement ? Array.from(el.parentElement.children) : [];
+  const idx = siblings.indexOf(el);
+  if (idx > 0 && idx < 6 && (el.classList.contains("bento-card") || el.classList.contains("step-card"))) {
+    el.style.transitionDelay = `${idx * 70}ms`;
+  }
+});
+
+if ("IntersectionObserver" in window) {
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          io.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+  );
+  revealTargets.forEach((el) => io.observe(el));
+} else {
+  revealTargets.forEach((el) => el.classList.add("is-visible"));
+}
+
+// Hero 区交互式双语/仅译文/原文预览切换（带丝滑淡入淡出）
 const demoSwitch = document.getElementById("demoSwitch");
 const demoBody = document.getElementById("demoBody");
 const demoTitle = document.getElementById("demoTitle");
-const demoPara = document.getElementById("demoPara");
-const demoParaOrig = document.getElementById("demoParaOrig");
-const demoParaTrans = document.getElementById("demoParaTrans");
-const sandboxSelBar = document.getElementById("sandboxSelBar");
-const sandboxPopupCard = document.getElementById("sandboxPopupCard");
-const sbPopupBtn = document.getElementById("sbPopupBtn");
-const sbImmersiveBtn = document.getElementById("sbImmersiveBtn");
+const demoText = document.getElementById("demoText");
 const demoPill = document.getElementById("demoPill");
-const demoPillMain = document.getElementById("demoPillMain");
-const demoPillMore = document.getElementById("demoPillMore");
 const demoPillText = document.getElementById("demoPillText");
-const demoQuickMenu = document.getElementById("demoQuickMenu");
-const dqmToggleMode = document.getElementById("dqmToggleMode");
-const dqmModeVal = document.getElementById("dqmModeVal");
-const dqmToggleAuto = document.getElementById("dqmToggleAuto");
-const dqmAutoVal = document.getElementById("dqmAutoVal");
-
 let currentDemoMode = "bilingual";
-let autoSiteEnabled = true;
 
-const DEMO_DATA = {
+const DEMO_CONTENT = {
   bilingual: {
-    titleOrig: "Read foreign pages without losing the original layout.",
-    titleTrans: "直接阅读外语网页，不破坏原本的页面排版。",
-    paraOrig:
-      "Highlight any sentence to translate just that part. You can view a popup with speech, or place the translation right under the paragraph.",
-    paraTrans:
-      "选中任意一句话就可以只翻这一部分。你可以弹窗查看并朗读，也可以把译文直接排在原段落下面。"
+    titleOrig: "Read the web in any language, effortlessly.",
+    titleTrans: "轻松无障碍地阅读任意语言的网页内容。",
+    textOrig:
+      "DualPage translates entire paragraphs naturally without breaking layouts or interrupting your flow. Switch between bilingual reading, clean translation, or original text in a single click.",
+    textTrans:
+      "DualPage 以自然的方式整段翻译网页内容，不破坏页面排版，也不打断阅读心流。只需轻点一下，即可在双语对照、纯译文与原文之间自由切换。"
   },
   replace: {
-    titleOrig: "直接阅读外语网页，不破坏原本的页面排版。",
+    titleOrig: "轻松无障碍地阅读任意语言的网页内容。",
     titleTrans: "",
-    paraOrig:
-      "选中任意一句话就可以只翻这一部分。你可以弹窗查看并朗读，也可以把译文直接排在原段落下面。",
-    paraTrans: ""
+    textOrig:
+      "DualPage 以自然的方式整段翻译网页内容，不破坏页面排版，也不打断阅读心流。只需轻点一下，即可在双语对照、纯译文与原文之间自由切换。",
+    textTrans: ""
   },
   original: {
-    titleOrig: "Read foreign pages without losing the original layout.",
+    titleOrig: "Read the web in any language, effortlessly.",
     titleTrans: "",
-    paraOrig:
-      "Highlight any sentence to translate just that part. You can view a popup with speech, or place the translation right under the paragraph.",
-    paraTrans: ""
+    textOrig:
+      "DualPage translates entire paragraphs naturally without breaking layouts or interrupting your flow. Switch between bilingual reading, clean translation, or original text in a single click.",
+    textTrans: ""
   }
 };
 
 function renderDemo(mode) {
   currentDemoMode = mode;
-  const data = DEMO_DATA[mode] || DEMO_DATA.bilingual;
-  sandboxSelBar?.classList.add("hidden");
-  sandboxPopupCard?.classList.add("hidden");
-  demoPara?.classList.remove("selected");
-
-  demoSwitch?.querySelectorAll(".mode-btn").forEach((b) => {
-    b.classList.toggle("active", b.dataset.demo === mode);
-  });
-
+  const data = DEMO_CONTENT[mode] || DEMO_CONTENT.bilingual;
   if (demoBody) demoBody.classList.add("switching");
   setTimeout(() => {
     if (demoTitle) {
       demoTitle.textContent = data.titleOrig;
       if (data.titleTrans) {
         const s = document.createElement("span");
-        s.className = "sample-trans";
+        s.className = "demo-trans";
         s.textContent = data.titleTrans;
         demoTitle.appendChild(s);
       }
     }
-    if (demoParaOrig) demoParaOrig.textContent = data.paraOrig;
-    if (demoParaTrans) {
-      demoParaTrans.textContent = data.paraTrans;
-      demoParaTrans.style.display = data.paraTrans ? "block" : "none";
+    if (demoText) {
+      demoText.textContent = data.textOrig;
+      if (data.textTrans) {
+        const s = document.createElement("span");
+        s.className = "demo-trans";
+        s.textContent = data.textTrans;
+        demoText.appendChild(s);
+      }
     }
     if (demoPill && demoPillText) {
       const isOrig = mode === "original";
       demoPill.classList.toggle("is-orig", isOrig);
       demoPillText.textContent = isOrig ? "翻译" : "原文";
     }
-    if (dqmModeVal) {
-      dqmModeVal.textContent = mode === "replace" ? "仅译文" : "双语";
-    }
     if (demoBody) demoBody.classList.remove("switching");
-  }, 110);
+  }, 150);
 }
 
 demoSwitch?.addEventListener("click", (e) => {
-  const btn = e.target.closest(".mode-btn");
+  const btn = e.target.closest(".demo-mode-btn");
   if (!btn || btn.classList.contains("active")) return;
+  demoSwitch.querySelectorAll(".demo-mode-btn").forEach((b) => b.classList.remove("active"));
+  btn.classList.add("active");
   renderDemo(btn.dataset.demo);
 });
 
-demoPillMain?.addEventListener("click", () => {
-  demoQuickMenu?.classList.add("hidden");
-  renderDemo(currentDemoMode === "original" ? "bilingual" : "original");
-});
-
-demoPillMore?.addEventListener("click", (e) => {
-  e.stopPropagation();
-  demoQuickMenu?.classList.toggle("hidden");
-});
-
-dqmToggleMode?.addEventListener("click", () => {
-  renderDemo(currentDemoMode === "bilingual" ? "replace" : "bilingual");
-  demoQuickMenu?.classList.add("hidden");
-});
-
-dqmToggleAuto?.addEventListener("click", () => {
-  autoSiteEnabled = !autoSiteEnabled;
-  if (dqmAutoVal) dqmAutoVal.textContent = autoSiteEnabled ? "开" : "关";
-  showCopyToast(autoSiteEnabled ? "已开启自动翻译本站（演示）" : "已关闭自动翻译本站（演示）");
-});
-
-demoPara?.addEventListener("click", () => {
-  demoQuickMenu?.classList.add("hidden");
-  const willSelect = !demoPara.classList.contains("selected");
-  demoPara.classList.toggle("selected", willSelect);
-  sandboxSelBar?.classList.toggle("hidden", !willSelect);
-  if (!willSelect) sandboxPopupCard?.classList.add("hidden");
-});
-
-sbPopupBtn?.addEventListener("click", () => {
-  sandboxPopupCard?.classList.remove("hidden");
-});
-
-sbImmersiveBtn?.addEventListener("click", () => {
-  sandboxPopupCard?.classList.add("hidden");
-  sandboxSelBar?.classList.add("hidden");
-  demoPara?.classList.remove("selected");
-  if (demoParaTrans) {
-    demoParaTrans.textContent = DEMO_DATA.bilingual.paraTrans;
-    demoParaTrans.style.display = "block";
-  }
-  showCopyToast("已在该段下方插入译文");
+demoPill?.addEventListener("click", () => {
+  const next = currentDemoMode === "original" ? "bilingual" : "original";
+  demoSwitch?.querySelectorAll(".demo-mode-btn").forEach((b) => {
+    b.classList.toggle("active", b.dataset.demo === next);
+  });
+  renderDemo(next);
 });
